@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="es" data-theme="dark"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gesto Smart Lite</title>
+    <title>Gesto Smart Lite - Plantilla</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -310,7 +310,6 @@
         </div>
     </div>
 
-    <!-- MOTOR JS SÚPER BLINDADO Y OPTIMIZADO -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBzgIYRyMFLL616w_OhOO_dC6bR7df5kCI",
@@ -334,7 +333,8 @@
             if(!Array.isArray(db.productos)) db.productos = [];
         }
         
-        try { const s = localStorage.getItem('catalogo_lite_generico'); if (s) { const p = JSON.parse(s); if (p && typeof p === 'object') { db = { ...db, ...p }; } } } catch (e) {}
+        // ARCHIVO LOCAL AISLADO
+        try { const s = localStorage.getItem('catalogo_plantilla_maestra'); if (s) { const p = JSON.parse(s); if (p && typeof p === 'object') { db = { ...db, ...p }; } } } catch (e) {}
         verificarIntegridadDB();
 
         let carritoWeb = []; let catActiva = 'TODAS';
@@ -351,7 +351,8 @@
                 try {
                     guardarLocal(db); 
                     if(esModoNube && firestoreDb) {
-                        firestoreDb.collection("lite_erp").doc("tienda_base").set(db)
+                        // DOCUMENTO AISLADO EN LA NUBE
+                        firestoreDb.collection("lite_erp").doc("plantilla_maestra").set(db)
                             .then(() => resolve(true))
                             .catch(e => { console.error(e); resolve(false); });
                     } else { resolve(true); }
@@ -361,7 +362,7 @@
         }
 
         function guardarLocal(baseData) {
-            try { localStorage.setItem('catalogo_lite_generico', JSON.stringify(baseData)); } catch(e) {}
+            try { localStorage.setItem('catalogo_plantilla_maestra', JSON.stringify(baseData)); } catch(e) {}
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -370,7 +371,8 @@
             if(esModoNube && firestoreDb) {
                 let fbTimeout = setTimeout(() => { if(!firebaseLoaded) { firebaseLoaded = true; iniciarAppSegunRouting(); } }, 4000);
                 
-                firestoreDb.collection("lite_erp").doc("tienda_base").onSnapshot(doc => {
+                // LEER SOLO DEL DOCUMENTO AISLADO
+                firestoreDb.collection("lite_erp").doc("plantilla_maestra").onSnapshot(doc => {
                     clearTimeout(fbTimeout);
                     if(isUploading) return; 
 
@@ -418,12 +420,10 @@
             if(document.getElementById('login-store-name')) document.getElementById('login-store-name').innerText = nombre;
             if(db.config.tema) { cambiarTema(db.config.tema, true); }
             
-            // Lógica del Logo
             if(db.config.logoBase64) {
                 if(document.getElementById('preview-logo')) document.getElementById('preview-logo').innerHTML = `<img src="${db.config.logoBase64}" class="w-full h-full object-cover">`;
                 if(document.getElementById('btn-borrar-logo')) document.getElementById('btn-borrar-logo').classList.remove('hidden');
                 
-                // Public y Login Logo
                 const pIcon = document.getElementById('public-logo-icon'), pImg = document.getElementById('public-logo-img');
                 if(pIcon && pImg) { pIcon.classList.add('hidden'); pImg.src = db.config.logoBase64; pImg.classList.remove('hidden'); }
                 const lIcon = document.getElementById('login-logo-icon'), lImg = document.getElementById('login-logo-img');
@@ -432,7 +432,6 @@
                 if(document.getElementById('preview-logo')) document.getElementById('preview-logo').innerHTML = `<i class="fas fa-image text-muted text-xl"></i>`;
                 if(document.getElementById('btn-borrar-logo')) document.getElementById('btn-borrar-logo').classList.add('hidden');
                 
-                // Public y Login Logo Reset
                 const pIcon = document.getElementById('public-logo-icon'), pImg = document.getElementById('public-logo-img');
                 if(pIcon && pImg) { pIcon.classList.remove('hidden'); pImg.src = ""; pImg.classList.add('hidden'); }
                 const lIcon = document.getElementById('login-logo-icon'), lImg = document.getElementById('login-logo-img');
@@ -445,16 +444,15 @@
             db.config.whatsappTurnos = document.getElementById('conf-empresa-ws').value.trim() || '';
             aplicarConfiguracion();
             mostrarToast('Configuración guardada');
-            guardarBD(); // Asíncrono en background
+            guardarBD(); 
         }
 
-        // ================= GESTION DE LOGO =================
         async function subirLogo(e) {
             const file = e.target.files[0]; if(!file) return;
             document.getElementById('carga-overlay-global').style.display = 'flex';
             document.getElementById('carga-overlay-msg').innerText = 'Subiendo logo...';
             try {
-                const base64 = await comprimirImagenAsincrona(file, 250); // Logo más chico
+                const base64 = await comprimirImagenAsincrona(file, 250);
                 db.config.logoBase64 = base64;
                 aplicarConfiguracion();
                 mostrarToast('Logo actualizado', 'bg-[#10b981]');
@@ -475,7 +473,6 @@
             }
         }
 
-        // ================= VISTA TIENDA =================
         function renderCats() {
             const c = document.getElementById('contenedor-categorias');
             if(!c) return;
@@ -494,7 +491,7 @@
             const grid = document.getElementById('grid-productos-tienda');
             if(!grid) return;
             grid.innerHTML = arr.length ? arr.map(p => {
-                const img = (p.imagenBase64 && p.imagenBase64.length > 50) ? p.imagenBase64 : 'https://via.placeholder.com/300/ffffff/cccccc?text=Tienda';
+                const img = (p.imagenBase64 && p.imagenBase64.length > 50) ? p.imagenBase64 : 'https://via.placeholder.com/300/1e293b/8b949e?text=Tienda';
                 return `<div class="product-card">
                             <img src="${img}" class="product-image" loading="lazy">
                             <div class="p-4 flex flex-col flex-grow">
@@ -512,7 +509,6 @@
             }).join('') : '<div class="col-span-full py-16 text-center text-muted font-bold text-sm">No hay productos en esta categoría.</div>';
         }
 
-        // ================= CARRITO =================
         function addCar(id) {
             const p = db.productos.find(x=>x.id===id); if(!p) return;
             const e = carritoWeb.find(x=>x.id===id);
@@ -555,7 +551,6 @@
             guardarBD().catch(()=>{}); 
         }
 
-        // ================= GESTIÓN ADMIN (ACTUALIZACIÓN OPTIMISTA) =================
         function renderStock() {
             const b = document.getElementById('lista-stock-tabla'); if(!b) return;
             const s = document.getElementById('buscador-stock').value.toLowerCase();
@@ -730,7 +725,6 @@
             });
         }
 
-        // ================= UTILIDADES =================
         function abrirCatalogoEnNuevaPestana() { window.open(window.location.href.split('?')[0] + '?modo=tienda', '_blank'); }
         function actualizarUI() { renderStock(); }
         function abrirLoginAdmin() { document.getElementById('login-pin').value=''; document.getElementById('public-catalog').classList.add('hidden'); document.getElementById('pantalla-login').classList.remove('hidden'); document.getElementById('pantalla-login').classList.add('flex'); }
