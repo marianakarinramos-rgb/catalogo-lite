@@ -200,7 +200,7 @@
                 <div id="tab-config" class="tab-content hidden fade-in">
                     <div class="max-w-4xl mx-auto bg-card/90 backdrop-blur rounded-3xl shadow-md border border-borderline p-6 md:p-8">
                         <h2 class="text-2xl font-bold text-main mb-1">Configuración de la Tienda</h2>
-                        <p class="text-muted text-sm mb-8">Personalizá tu marca, elegí el diseño y conectá tu WhatsApp.</p>
+                        <p class="text-muted text-sm mb-8">Personalizá tu marca, elegí el diseño y gestioná tus accesos.</p>
                         
                         <div class="space-y-6">
                             <div class="bg-input p-6 rounded-2xl border border-borderline shadow-sm">
@@ -212,12 +212,18 @@
                                     <button onclick="cambiarTema('mint')" id="btn-theme-mint" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#f0fdf4] text-[#34d399] border-[#34d399]">Mint Natural</button>
                                 </div>
                             </div>
+                            
                             <div class="bg-input p-6 rounded-2xl border border-borderline shadow-sm">
-                                <h3 class="text-sm font-bold text-main mb-4 border-b border-borderline pb-2"><i class="fas fa-store text-[#10b981] mr-2"></i> Datos Públicos</h3>
+                                <h3 class="text-sm font-bold text-main mb-4 border-b border-borderline pb-2"><i class="fas fa-store text-[#10b981] mr-2"></i> Datos Públicos y Seguridad</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div><label class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-1">Nombre del Local</label><input type="text" id="conf-empresa-nombre" class="w-full border border-borderline p-3 rounded-xl bg-input text-main outline-none text-sm font-bold focus:border-accent"></div>
                                     <div><label class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-1">WhatsApp Recepción Pedidos</label><input type="text" id="conf-empresa-ws" class="w-full border border-borderline p-3 rounded-xl bg-input text-main outline-none text-sm font-bold focus:border-accent" placeholder="Ej: 5491100000000"></div>
                                     
+                                    <div class="md:col-span-2 border-t border-borderline pt-4 mt-2">
+                                        <label class="text-[10px] font-bold text-accent uppercase tracking-widest block mb-1"><i class="fas fa-key mr-1"></i> PIN de Acceso al Panel Admin (4 dígitos)</label>
+                                        <input type="password" id="conf-empresa-pin" maxlength="4" class="w-full md:w-1/2 border border-borderline p-3 rounded-xl bg-input text-main outline-none text-sm font-bold focus:border-accent" placeholder="1234">
+                                    </div>
+
                                     <div class="md:col-span-2 pt-4 border-t border-borderline mt-2">
                                         <label class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-2">Logo de la Tienda (Opcional)</label>
                                         <div class="flex items-center gap-3">
@@ -356,7 +362,8 @@
         let db = { config: {}, usuarios: [], productos: [] };
         
         function verificarIntegridadDB() {
-            if(!db.config) db.config = { nombreEmpresa: 'Mi Tienda', whatsappTurnos: '', tema: 'dark', logoBase64: '' };
+            if(!db.config) db.config = { nombreEmpresa: 'Mi Tienda', whatsappTurnos: '', tema: 'dark', logoBase64: '', pinAdmin: '1234' };
+            if(!db.config.pinAdmin) db.config.pinAdmin = '1234';
             if(!db.usuarios || db.usuarios.length===0) db.usuarios = [ { id: 'admin', nombre: 'Admin', pin: '1234' } ];
             if(!Array.isArray(db.productos)) db.productos = [];
         }
@@ -441,6 +448,7 @@
             const nombre = db.config.nombreEmpresa || 'Mi Tienda';
             if(document.getElementById('conf-empresa-nombre')) document.getElementById('conf-empresa-nombre').value = nombre;
             if(document.getElementById('conf-empresa-ws')) document.getElementById('conf-empresa-ws').value = db.config.whatsappTurnos || '';
+            if(document.getElementById('conf-empresa-pin')) document.getElementById('conf-empresa-pin').value = db.config.pinAdmin || '1234';
             if(document.getElementById('store-name')) document.getElementById('store-name').innerText = nombre;
             if(document.getElementById('login-store-name')) document.getElementById('login-store-name').innerText = nombre;
             if(db.config.tema) { cambiarTema(db.config.tema, true); }
@@ -477,6 +485,15 @@
         function guardarInfoEmpresa() { 
             db.config.nombreEmpresa = document.getElementById('conf-empresa-nombre').value.trim() || 'Mi Tienda';
             db.config.whatsappTurnos = document.getElementById('conf-empresa-ws').value.trim() || '';
+            
+            const nuevoPin = document.getElementById('conf-empresa-pin').value.trim();
+            if(nuevoPin && nuevoPin.length === 4) {
+                db.config.pinAdmin = nuevoPin;
+            } else if (nuevoPin) {
+                mostrarToast('El PIN debe tener 4 dígitos', 'bg-[#ef4444]');
+                return;
+            }
+
             aplicarConfiguracion();
             mostrarToast('Configuración guardada');
             guardarBD(); 
@@ -778,7 +795,20 @@
         function abrirCatalogoEnNuevaPestana() { window.open(window.location.href.split('?')[0] + '?modo=tienda', '_blank'); }
         function actualizarUI() { renderStock(); }
         function abrirLoginAdmin() { document.getElementById('login-pin').value=''; document.getElementById('public-catalog').classList.add('hidden'); document.getElementById('pantalla-login').classList.remove('hidden'); document.getElementById('pantalla-login').classList.add('flex'); }
-        function procesarLogin() { if(document.getElementById('login-pin').value==='1234') { document.getElementById('pantalla-login').classList.add('hidden'); document.getElementById('erp-container').classList.remove('hidden'); document.getElementById('erp-container').classList.add('flex'); document.body.classList.remove('modo-tienda-activa'); actualizarUI(); } else mostrarToast('PIN Incorrecto'); }
+        
+        function procesarLogin() { 
+            const pinValido = db.config.pinAdmin || '1234';
+            if(document.getElementById('login-pin').value === pinValido) { 
+                document.getElementById('pantalla-login').classList.add('hidden'); 
+                document.getElementById('erp-container').classList.remove('hidden'); 
+                document.getElementById('erp-container').classList.add('flex'); 
+                document.body.classList.remove('modo-tienda-activa'); 
+                actualizarUI(); 
+            } else {
+                mostrarToast('PIN Incorrecto', 'bg-[#ef4444]');
+            }
+        }
+
         function procesarLogout() { document.getElementById('erp-container').classList.add('hidden'); document.getElementById('public-catalog').classList.remove('hidden'); document.body.classList.add('modo-tienda-activa'); renderTiendaWeb(); }
         function switchTab(t, el) { document.querySelectorAll('.tab-content').forEach(x=>x.classList.add('hidden')); document.querySelectorAll('.tab-link').forEach(x=>x.classList.remove('active')); document.getElementById(t).classList.remove('hidden'); el.classList.add('active'); }
         function abrirModalUI(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
