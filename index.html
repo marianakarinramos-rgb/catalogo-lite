@@ -377,7 +377,7 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR DE IMPRESIÓN PDF EN GRILLA ESTABLE -->
+    <!-- CONTENEDOR DE IMPRESIÓN PDF EN GRILLA PERFECTA -->
     <div id="pdf-mayorista-preview" style="display:none;"></div>
 
     <script>
@@ -790,7 +790,7 @@
             mostrarToast('Excel descargado con éxito');
         }
 
-        // ================= CATÁLOGO PDF: TABLA DE TARJETAS ORDENADAS =================
+        // ================= CATÁLOGO PDF: GRILLA PERFECTA (4 POR FILA) =================
         function generarCatalogoPDF() {
             if(!db.productos || db.productos.length === 0) return mostrarToast('El catálogo está vacío', 'bg-[#f59e0b]');
             
@@ -798,11 +798,11 @@
             const fechaActual = new Date().toLocaleDateString('es-AR');
             
             let htmlContent = `
-                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 800px; margin: 0 auto; padding: 10px;">
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 900px; margin: 0 auto; padding: 15px;">
                     <!-- ENCABEZADO -->
                     <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 20px;">
                         <div>
-                            <h1 style="margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase; color: #0f172a;">Catálogo Mayorista</h1>
+                            <h1 style="margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase; color: #0f172a; letter-spacing: 1px;">Catálogo Mayorista</h1>
                             <p style="margin: 3px 0 0 0; font-size: 10px; color: #64748b; font-weight: 600;">Actualizado al ${fechaActual} • Venta Exclusiva Mayorista</p>
                         </div>
                     </div>
@@ -816,50 +816,38 @@
 
                 htmlContent += `
                     <div style="margin-bottom: 25px; page-break-inside: avoid;">
-                        <h2 style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 10px;">${cat}</h2>
-                        <table style="width: 100%; border-collapse: separate; border-spacing: 8px;">
-                            <tr>
+                        <h2 style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 12px; letter-spacing: 0.5px;">${cat}</h2>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                 `;
 
-                prodsCat.forEach((p, index) => {
-                    if (index > 0 && index % 4 === 0) {
-                        htmlContent += `</tr><tr>`;
-                    }
-
+                prodsCat.forEach(p => {
                     const img = (p.imagenBase64 && p.imagenBase64.length > 50) ? p.imagenBase64 : '';
                     const imgTag = img 
                         ? `<img src="${img}" style="width: 100%; height: 110px; object-fit: contain; background: #ffffff; padding: 6px; border-bottom: 1px solid #e2e8f0;">` 
                         : `<div style="width: 100%; height: 110px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #94a3b8; font-weight: bold;">Sin Imagen</div>`;
                     
                     htmlContent += `
-                        <td style="width: 25%; vertical-align: top; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; padding: 0;">
+                        <div style="width: 23%; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid;">
                             <div>${imgTag}</div>
-                            <div style="padding: 8px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-                                    <span style="font-size: 6px; background: #f1f5f9; border: 1px solid #e2e8f0; color: #0284c7; padding: 1px 4px; border-radius: 3px; font-weight: bold; text-transform: uppercase;">${p.categoria||'VAR'}</span>
-                                    <span style="font-size: 6px; color: #64748b; font-weight: bold;">SKU: ${p.sku||'-'}</span>
+                            <div style="padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                                        <span style="font-size: 6px; background: #f1f5f9; border: 1px solid #e2e8f0; color: #0284c7; padding: 1px 4px; border-radius: 3px; font-weight: bold; text-transform: uppercase;">${p.categoria||'VAR'}</span>
+                                        <span style="font-size: 6px; color: #64748b; font-weight: bold;">SKU: ${p.sku||'-'}</span>
+                                    </div>
+                                    <h4 style="font-size: 10px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.nombre}</h4>
                                 </div>
-                                <h4 style="font-size: 10px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0; line-height: 1.2; height: 24px; overflow: hidden;">${p.nombre}</h4>
                                 <div style="border-top: 1px solid #f1f5f9; padding-top: 4px; margin-top: 4px;">
                                     <span style="font-size: 6px; font-weight: bold; color: #64748b; display: block; text-transform: uppercase;">Precio Final</span>
                                     <span style="font-size: 12px; font-weight: 900; color: #0284c7;">$ ${(p.precio || 0).toLocaleString('es-AR')}</span>
                                 </div>
                             </div>
-                        </td>
+                        </div>
                     `;
                 });
 
-                // Rellenar celdas vacías si la última fila no completa 4 columnas
-                const resto = prodsCat.length % 4;
-                if (resto > 0) {
-                    for (let r = 0; r < (4 - resto); r++) {
-                        htmlContent += `<td style="width: 25%; border: none;"></td>`;
-                    }
-                }
-
                 htmlContent += `
-                            </tr>
-                        </table>
+                        </div>
                     </div>
                 `;
             });
