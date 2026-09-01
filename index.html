@@ -6,7 +6,6 @@
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#050b14">
-    <!-- Forzado de íconos para evitar caché -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icono-192x192.png">
     <link rel="apple-touch-icon" href="/icono-192x192.png">
     
@@ -72,8 +71,8 @@
         .cargando-spinner { width: 40px; height: 40px; border: 4px solid var(--border-color); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        .btn-excel { background-color: #10b981; color: #ffffff; transition: 0.2s; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); cursor: pointer; }
-        .btn-excel:hover { background-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        .btn-excel { background-color: #10b981; color: #ffffff; transition: 0.2s; cursor: pointer; }
+        .btn-excel:hover { background-color: #059669; }
         
         input, select, textarea { background-color: var(--bg-input) !important; border-color: var(--border-color) !important; color: var(--text-main) !important; }
         input:focus, select:focus, textarea:focus { outline: none !important; border-color: var(--accent-color) !important; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1) !important; }
@@ -103,11 +102,12 @@
         .btn-theme:hover { opacity: 1; transform: scale(1.02); }
         .btn-theme.active { opacity: 1; border-color: var(--accent-color); box-shadow: 0 0 15px rgba(0,0,0,0.1); }
 
-        /* Estilos exclusivos para impresión de PDF Mayorista */
+        /* Estilos limpios y neutros para la impresión del PDF Mayorista */
         @media print {
-            body { background: white !important; color: black !important; overflow: auto !important; }
-            #erp-container, #toast-container, .cargando-overlay { display: none !important; }
-            #pdf-mayorista-preview { display: block !important; position: absolute; inset: 0; background: white; z-index: 999999; padding: 20px; }
+            body { background: #ffffff !important; background-image: none !important; color: #111827 !important; overflow: visible !important; }
+            #erp-container, #toast-container, .cargando-overlay, #public-catalog, #pantalla-login { display: none !important; }
+            #pdf-mayorista-preview { display: block !important; position: static !important; width: 100% !important; background: #ffffff !important; }
+            @page { margin: 10mm; size: auto; }
         }
     </style>
 </head>
@@ -162,37 +162,51 @@
             <div class="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto w-full pt-16 md:pt-6">
                 
                 <div id="tab-catalogo" class="tab-content fade-in">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-borderline pb-4">
                         <div>
-                            <h2 class="text-2xl md:text-3xl font-bold text-main mb-1">Gestión de Catálogo</h2>
-                            <p class="text-muted text-sm">Cargá tus productos, subí las fotos y guardá respaldos.</p>
+                            <h2 class="text-2xl font-bold text-main">Gestión de Catálogo</h2>
+                            <p class="text-muted text-xs">Cargá tus productos, subí fotos y exportá listas.</p>
                         </div>
-                        <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto flex-wrap justify-end">
-                            <button onclick="generarCatalogoPDF()" class="w-full md:w-auto bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-4 py-2.5 rounded-xl font-bold transition text-sm shadow-sm flex justify-center items-center"><i class="fas fa-file-pdf mr-2"></i> Catálogo PDF Mayorista</button>
-                            <button onclick="exportarExcel()" class="w-full md:w-auto bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-2.5 rounded-xl font-bold transition text-sm shadow-sm flex justify-center items-center"><i class="fas fa-file-export mr-2"></i> Descargar Excel</button>
-                            <button onclick="vaciarCatalogo()" class="w-full md:w-auto bg-[#ef4444] hover:bg-[#dc2626] text-white px-4 py-2.5 rounded-xl font-bold transition text-sm shadow-sm flex justify-center items-center"><i class="fas fa-trash-alt mr-2"></i> Borrar Todo</button>
-                            <button onclick="aumentoMasivo()" class="w-full md:w-auto bg-[#f59e0b] hover:bg-[#d97706] text-white px-4 py-2.5 rounded-xl font-bold transition text-sm shadow-sm flex justify-center items-center"><i class="fas fa-percentage mr-2"></i> Aumentar %</button>
-                            <label class="btn-excel font-bold px-4 py-2.5 rounded-xl flex items-center justify-center text-sm cursor-pointer w-full md:w-auto transition">
-                                <i class="fas fa-file-import mr-2"></i> Subir Excel
+                        
+                        <!-- BOTONERA COMPACTA DE ACCIÓN -->
+                        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start lg:justify-end">
+                            <button onclick="abrirModalStock()" class="bg-accent text-accenttext px-3 py-2 rounded-lg font-bold text-xs shadow-sm hover:opacity-90 transition flex items-center">
+                                <i class="fas fa-plus mr-1.5"></i> Cargar
+                            </button>
+                            <label class="btn-excel font-bold px-3 py-2 rounded-lg text-xs cursor-pointer shadow-sm transition flex items-center">
+                                <i class="fas fa-file-import mr-1.5"></i> Subir Excel
                                 <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importarExcel(event)">
                             </label>
-                            <button onclick="abrirModalStock()" class="w-full md:w-auto bg-accent text-accenttext px-4 py-2.5 rounded-xl font-bold shadow-sm hover:opacity-90 transition flex justify-center items-center text-sm"><i class="fas fa-plus mr-1"></i> Cargar Manual</button>
+                            <button onclick="aumentoMasivo()" class="bg-[#f59e0b] hover:bg-[#d97706] text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center" title="Aumentar o rebajar precios por %">
+                                <i class="fas fa-percentage mr-1.5"></i> Ajustar %
+                            </button>
+                            <button onclick="generarCatalogoPDF()" class="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
+                                <i class="fas fa-file-pdf mr-1.5"></i> PDF Mayorista
+                            </button>
+                            <button onclick="exportarExcel()" class="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
+                                <i class="fas fa-file-export mr-1.5"></i> Bajar Excel
+                            </button>
+                            <button onclick="vaciarCatalogo()" class="bg-[#ef4444] hover:bg-[#dc2626] text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
+                                <i class="fas fa-trash-alt mr-1.5"></i> Vaciar
+                            </button>
                         </div>
                     </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div class="bg-card p-5 rounded-2xl shadow-sm border border-borderline">
-                            <h3 class="text-sm font-bold text-main mb-2"><i class="fas fa-bolt text-accent mr-2"></i> Subida Masiva de Fotos</h3>
-                            <p class="text-[10px] text-muted mb-4">Seleccioná todas las fotos juntas. El sistema buscará el número de SKU automáticamente sin importar cómo se llame el archivo.</p>
-                            <label class="bg-input text-main border border-borderline font-bold px-4 py-2.5 rounded-xl shadow-sm flex items-center justify-center text-sm cursor-pointer w-full transition hover:border-accent hover:text-accent">
+                            <h3 class="text-sm font-bold text-main mb-1"><i class="fas fa-bolt text-accent mr-2"></i> Subida Masiva de Fotos</h3>
+                            <p class="text-[10px] text-muted mb-3">Seleccioná fotos juntas. El sistema detecta el número de SKU automáticamente.</p>
+                            <label class="bg-input text-main border border-borderline font-bold px-4 py-2.5 rounded-xl shadow-sm flex items-center justify-center text-xs cursor-pointer w-full transition hover:border-accent hover:text-accent">
                                 <i class="fas fa-images mr-2"></i> Seleccionar Imágenes
                                 <input type="file" multiple accept="image/*" class="hidden" id="input-imagenes-catalogo" onchange="procesarImagenesCatalogo(event)">
                             </label>
                         </div>
-                        <div class="md:col-span-2 relative bg-card rounded-2xl shadow-sm border border-borderline flex items-center h-full min-h-[100px]">
+                        <div class="md:col-span-2 relative bg-card rounded-2xl shadow-sm border border-borderline flex items-center h-full min-h-[90px]">
                             <i class="fas fa-search absolute left-5 text-muted text-lg"></i>
-                            <input type="text" id="buscador-stock" placeholder="Buscar por código SKU o nombre del artículo..." oninput="debouncedRenderStock()" class="w-full h-full pl-14 pr-14 border-none bg-transparent outline-none font-bold text-main rounded-2xl text-lg">
+                            <input type="text" id="buscador-stock" placeholder="Buscar por código SKU o nombre del artículo..." oninput="debouncedRenderStock()" class="w-full h-full pl-14 pr-6 border-none bg-transparent outline-none font-bold text-main rounded-2xl text-base">
                         </div>
                     </div>
+
                     <div class="bg-card/90 backdrop-blur rounded-2xl shadow-md border border-borderline overflow-x-auto pb-10">
                         <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead>
@@ -221,8 +235,8 @@
                                 <h3 class="text-sm font-bold text-accent mb-2 border-b border-borderline pb-2"><i class="fas fa-palette mr-2"></i> APARIENCIA</h3>
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
                                     <button onclick="cambiarTema('sky')" id="btn-theme-sky" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#f0f4f8] text-[#38bdf8] border-[#38bdf8]">Sky Pastel</button>
-                                    <button onclick="cambiarTema('dark')" id="btn-theme-dark" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#050b14] text-[#00bfff] border-[#00bfff]">Dark Elegance</button>
-                                    <button onclick="cambiarTema('rose')" id="btn-theme-rose" class="btn-theme active py-3 px-2 rounded-xl font-bold text-sm bg-[#fff1f2] text-[#fb7185] border-[#fb7185]">Rosé Glamour</button>
+                                    <button onclick="cambiarTema('dark')" id="btn-theme-dark" class="btn-theme active py-3 px-2 rounded-xl font-bold text-sm bg-[#050b14] text-[#00bfff] border-[#00bfff]">Dark Elegance</button>
+                                    <button onclick="cambiarTema('rose')" id="btn-theme-rose" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#fff1f2] text-[#fb7185] border-[#fb7185]">Rosé Glamour</button>
                                     <button onclick="cambiarTema('mint')" id="btn-theme-mint" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#f0fdf4] text-[#34d399] border-[#34d399]">Mint Natural</button>
                                 </div>
                             </div>
@@ -363,7 +377,7 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR OCULTO PARA IMPRESIÓN DE PDF MAYORISTA -->
+    <!-- CONTENEDOR DE IMPRESIÓN PDF MAYORISTA LIMPIO -->
     <div id="pdf-mayorista-preview" style="display:none;"></div>
 
     <script>
@@ -384,7 +398,7 @@
         let db = { config: {}, usuarios: [], productos: [] };
         
         function verificarIntegridadDB() {
-            if(!db.config) db.config = { nombreEmpresa: 'Mi Tienda', whatsappTurnos: '', tema: 'rose', logoBase64: '', pinAdmin: '1234' };
+            if(!db.config) db.config = { nombreEmpresa: 'Mi Tienda', whatsappTurnos: '', tema: 'dark', logoBase64: '', pinAdmin: '1234' };
             if(!db.config.pinAdmin) db.config.pinAdmin = '1234';
             if(!db.usuarios || db.usuarios.length===0) db.usuarios = [ { id: 'admin', nombre: 'Admin', pin: '1234' } ];
             if(!Array.isArray(db.productos)) db.productos = [];
@@ -515,7 +529,7 @@
                 const pIcon = document.getElementById('public-logo-icon'), pImg = document.getElementById('public-logo-img');
                 if(pIcon && pImg) { pIcon.classList.add('hidden'); pImg.src = db.config.logoBase64; pImg.classList.remove('hidden'); }
                 const lIcon = document.getElementById('login-logo-icon'), lImg = document.getElementById('login-logo-img');
-                if(lIcon && lImg) { lIcon.classList.add('hidden'); lImg.src = db.config.logoBase64; lImg.classList.remove('hidden'); }
+                if(lIcon && lImg) { lIcon.classList.remove('hidden'); lImg.src = db.config.logoBase64; lImg.classList.remove('hidden'); }
                 
                 actualizarFaviconDinamico(db.config.logoBase64);
             } else {
@@ -706,7 +720,7 @@
         }
         
         function delP(id) { 
-            if(confirm('¿Borrar?')) { 
+            if(confirm('¿Borrar producto?')) { 
                 db.productos = db.productos.filter(x => x.id !== id); 
                 renderStock(); renderCats();
                 guardarBD();
@@ -722,13 +736,20 @@
             } 
         }
 
+        // ================= AJUSTE MASIVO DE PRECIOS (+ O - %) =================
         function aumentoMasivo() {
-            let pct = prompt("Aumento %:");
-            if(pct && !isNaN(pct)) { 
-                let m=1+(parseFloat(pct)/100); 
-                db.productos.forEach(x=>x.precio=Math.round(x.precio*m)); 
-                renderStock(); renderTiendaWeb(); 
-                mostrarToast(`Aumento aplicado: ${pct}%`); 
+            let pct = prompt("Modificación porcentual de precios:\n• Ingresá un número positivo para aumentar (Ej: 10 para +10%)\n• Ingresá un número negativo para bajar o corregir (Ej: -3 para -3%)");
+            if(pct !== null && pct.trim() !== "" && !isNaN(pct)) { 
+                let pNum = parseFloat(pct);
+                let m = 1 + (pNum / 100); 
+                db.productos.forEach(x => {
+                    if (x.precio) {
+                        x.precio = Math.round(x.precio * m);
+                    }
+                }); 
+                renderStock(); 
+                renderTiendaWeb(); 
+                mostrarToast(pNum >= 0 ? `Precios aumentados +${pNum}%` : `Precios rebajados ${pNum}%`, 'bg-[#f59e0b]'); 
                 guardarBD();
             }
         }
@@ -769,7 +790,7 @@
             mostrarToast('Excel descargado con éxito');
         }
 
-        // ================= NUEVA FUNCIÓN: GENERAR CATÁLOGO MAYORISTA PDF =================
+        // ================= CATÁLOGO PDF MAYORISTA (DISEÑO EDITORIAL LIMPIO) =================
         function generarCatalogoPDF() {
             if(!db.productos || db.productos.length === 0) return mostrarToast('El catálogo está vacío', 'bg-[#f59e0b]');
             
@@ -777,14 +798,19 @@
             const fechaActual = new Date().toLocaleDateString('es-AR');
             
             let htmlContent = `
-                <div style="font-family: Arial, sans-serif; color: #111; max-width: 800px; margin: 0 auto; padding: 20px;">
-                    <div style="text-align: center; border-bottom: 3px solid #333; padding-bottom: 15px; margin-bottom: 25px;">
-                        <h1 style="margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px;">Catálogo Mayorista</h1>
-                        <p style="margin: 5px 0 0 0; font-size: 14px; color: #555;">Actualizado al: ${fechaActual} | Venta Exclusiva Mayorista</p>
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 900px; margin: 0 auto; padding: 15px;">
+                    <!-- ENCABEZADO MINIMALISTA -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px;">
+                        <div>
+                            <h1 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #0f172a;">LISTA DE PRECIOS MAYORISTA</h1>
+                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b; font-weight: 600;">Venta por mayor • Stock sujeto a disponibilidad</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 10px; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; color: #475569;">ACTUALIZADO: ${fechaActual}</span>
+                        </div>
                     </div>
             `;
 
-            // Agrupar por categorías
             const categorias = [...new Set(db.productos.map(p => p.categoria || 'VARIOS'))];
             
             categorias.forEach(cat => {
@@ -792,31 +818,35 @@
                 if(prodsCat.length === 0) return;
 
                 htmlContent += `
-                    <div style="margin-bottom: 25px;">
-                        <h2 style="background: #222; color: #fff; padding: 8px 12px; font-size: 14px; text-transform: uppercase; margin: 0 0 10px 0; border-radius: 4px;">${cat}</h2>
-                        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <div style="margin-bottom: 22px; page-break-inside: avoid;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 8px;">
+                            <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px;">${cat}</span>
+                            <span style="font-size: 10px; color: #94a3b8; font-weight: 600;">${prodsCat.length} artículos</span>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                             <thead>
-                                <tr style="border-bottom: 2px solid #222; text-align: left;">
-                                    <th style="padding: 6px; width: 50px;">Foto</th>
-                                    <th style="padding: 6px; width: 80px;">SKU</th>
-                                    <th style="padding: 6px;">Producto</th>
-                                    <th style="padding: 6px; text-align: right; width: 100px;">Precio Mayorista</th>
+                                <tr style="border-bottom: 1px solid #e2e8f0; text-align: left; color: #64748b; font-size: 9px; text-transform: uppercase;">
+                                    <th style="padding: 4px 6px; width: 42px;">Foto</th>
+                                    <th style="padding: 4px 6px; width: 60px;">SKU</th>
+                                    <th style="padding: 4px 6px;">Descripción del Producto</th>
+                                    <th style="padding: 4px 6px; text-align: right; width: 110px;">Precio Unit.</th>
                                 </tr>
                             </thead>
                             <tbody>
                 `;
 
-                prodsCat.forEach(p => {
+                prodsCat.forEach((p, idx) => {
+                    const bgFila = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
                     const imgTag = (p.imagenBase64 && p.imagenBase64.length > 50) 
-                        ? `<img src="${p.imagenBase64}" style="width: 40px; height: 40px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;">` 
-                        : `<div style="width: 40px; height: 40px; background: #eee; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #777;">Sin Foto</div>`;
+                        ? `<img src="${p.imagenBase64}" style="width: 32px; height: 32px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 4px; background: #fff;">` 
+                        : `<div style="width: 32px; height: 32px; background: #f1f5f9; border-radius: 4px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 7px; color: #94a3b8; font-weight: bold;">S/F</div>`;
                     
                     htmlContent += `
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 6px; vertical-align: middle;">${imgTag}</td>
-                            <td style="padding: 6px; vertical-align: middle; color: #555; font-weight: bold;">${p.sku || '-'}</td>
-                            <td style="padding: 6px; vertical-align: middle; font-weight: bold; color: #222;">${p.nombre}</td>
-                            <td style="padding: 6px; vertical-align: middle; text-align: right; font-weight: bold; color: #059669; font-size: 14px;">$${(p.precio || 0).toLocaleString('es-AR')}</td>
+                        <tr style="border-bottom: 1px solid #f1f5f9; background-color: ${bgFila};">
+                            <td style="padding: 4px 6px; vertical-align: middle;">${imgTag}</td>
+                            <td style="padding: 4px 6px; vertical-align: middle; color: #64748b; font-weight: 700; font-size: 10px;">${p.sku || '-'}</td>
+                            <td style="padding: 4px 6px; vertical-align: middle; font-weight: 600; color: #1e293b;">${p.nombre}</td>
+                            <td style="padding: 4px 6px; vertical-align: middle; text-align: right; font-weight: 800; color: #0f172a; font-size: 12px;">$ ${(p.precio || 0).toLocaleString('es-AR')}</td>
                         </tr>
                     `;
                 });
@@ -829,8 +859,8 @@
             });
 
             htmlContent += `
-                    <div style="text-align: center; margin-top: 40px; font-size: 11px; color: #777; border-top: 1px solid #ddd; padding-top: 15px;">
-                        <p>Precios sujetos a modificación sin previo aviso. Realice su pedido directo por WhatsApp.</p>
+                    <div style="text-align: center; margin-top: 30px; font-size: 10px; color: #94a3b8; border-top: 1px dashed #cbd5e1; padding-top: 12px;">
+                        Precios sujetos a modificación sin previo aviso. Los pedidos se recepcionan por canales oficiales.
                     </div>
                 </div>
             `;
