@@ -242,6 +242,21 @@
     </div>
 
     <div id="public-catalog" class="hidden flex-col fixed inset-0 z-[99999] overflow-y-auto bg-base">
+        <div id="pwa-install-banner" class="hidden bg-accent/10 border border-accent/30 rounded-2xl p-4 mx-4 my-3 flex items-center justify-between fade-in shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-accent text-accenttext rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-main">Instalar Aplicación</h4>
+                    <p class="text-[10px] text-muted">Acceso directo en tu pantalla de inicio</p>
+                </div>
+            </div>
+            <button id="btn-pwa-install" onclick="ejecutarInstalacionPWA()" class="bg-accent text-accenttext font-bold text-xs px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition">
+                Instalar
+            </button>
+        </div>
+
         <header class="bg-input border-b border-borderline sticky top-0 z-10 px-4 md:px-8 py-4 flex justify-between items-center shadow-md">
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 bg-accent text-accenttext rounded-xl flex items-center justify-center font-black text-xl shadow-md overflow-hidden" id="public-logo-container">
@@ -254,6 +269,9 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
+                <button onclick="compartirTienda()" class="text-main hover:text-accent text-lg transition bg-card border border-borderline w-11 h-11 rounded-xl flex items-center justify-center shadow-sm">
+                    <i class="fas fa-share-alt"></i>
+                </button>
                 <button onclick="abrirLoginAdmin()" class="text-muted hover:text-main text-xs bg-card border border-borderline px-3 py-2 rounded-xl transition flex items-center gap-2 shadow-sm"><i class="fas fa-lock"></i></button>
                 <button onclick="abrirCarritoWeb()" class="relative text-main hover:text-accent text-2xl transition bg-card border border-borderline w-11 h-11 rounded-xl flex items-center justify-center shadow-sm">
                     <i class="fas fa-shopping-bag"></i>
@@ -270,6 +288,18 @@
         </div>
         <div class="flex-grow p-4 md:p-8 overflow-y-auto">
             <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6" id="grid-productos-tienda"></div>
+        </div>
+    </div>
+
+    <div id="modal-ios-install" class="fixed inset-0 bg-black/80 hidden items-end justify-center p-4 backdrop-blur-sm z-[9999999]">
+        <div class="bg-card border border-borderline rounded-t-3xl w-full max-w-md p-6 text-center fade-in space-y-4">
+            <div class="w-12 h-1 bg-borderline rounded-full mx-auto mb-2"></div>
+            <h3 class="text-base font-bold text-main">Instalar en iPhone / iPad</h3>
+            <p class="text-xs text-muted leading-relaxed">
+                1. Toca el botón <strong>Compartir</strong> <i class="fas fa-share-square text-accent"></i> en la barra inferior.<br>
+                2. Selecciona <strong>"Agregar a inicio"</strong> <i class="fas fa-plus-square text-accent"></i>.
+            </p>
+            <button onclick="cerrarModal('modal-ios-install')" class="w-full bg-input text-main py-3 rounded-xl font-bold text-xs border border-borderline">Entendido</button>
         </div>
     </div>
 
@@ -331,7 +361,6 @@
             if(!Array.isArray(db.productos)) db.productos = [];
         }
         
-        // ARCHIVO LOCAL AISLADO
         try { const s = localStorage.getItem('catalogo_plantilla_maestra'); if (s) { const p = JSON.parse(s); if (p && typeof p === 'object') { db = { ...db, ...p }; } } } catch (e) {}
         verificarIntegridadDB();
 
@@ -349,7 +378,6 @@
                 try {
                     guardarLocal(db); 
                     if(esModoNube && firestoreDb) {
-                        // DOCUMENTO AISLADO EN LA NUBE
                         firestoreDb.collection("lite_erp").doc("plantilla_maestra").set(db)
                             .then(() => resolve(true))
                             .catch(e => { console.error(e); resolve(false); });
@@ -369,7 +397,6 @@
             if(esModoNube && firestoreDb) {
                 let fbTimeout = setTimeout(() => { if(!firebaseLoaded) { firebaseLoaded = true; iniciarAppSegunRouting(); } }, 4000);
                 
-                // LEER SOLO DEL DOCUMENTO AISLADO
                 firestoreDb.collection("lite_erp").doc("plantilla_maestra").onSnapshot(doc => {
                     clearTimeout(fbTimeout);
                     if(isUploading) return; 
@@ -426,6 +453,8 @@
                 if(pIcon && pImg) { pIcon.classList.add('hidden'); pImg.src = db.config.logoBase64; pImg.classList.remove('hidden'); }
                 const lIcon = document.getElementById('login-logo-icon'), lImg = document.getElementById('login-logo-img');
                 if(lIcon && lImg) { lIcon.classList.add('hidden'); lImg.src = db.config.logoBase64; lImg.classList.remove('hidden'); }
+                
+                actualizarFaviconDinamico(db.config.logoBase64);
             } else {
                 if(document.getElementById('preview-logo')) document.getElementById('preview-logo').innerHTML = `<i class="fas fa-image text-muted text-xl"></i>`;
                 if(document.getElementById('btn-borrar-logo')) document.getElementById('btn-borrar-logo').classList.add('hidden');
@@ -435,6 +464,14 @@
                 const lIcon = document.getElementById('login-logo-icon'), lImg = document.getElementById('login-logo-img');
                 if(lIcon && lImg) { lIcon.classList.remove('hidden'); lImg.src = ""; lImg.classList.add('hidden'); }
             }
+        }
+
+        function actualizarFaviconDinamico(base64Img) {
+            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = base64Img;
+            document.getElementsByTagName('head')[0].appendChild(link);
         }
 
         function guardarInfoEmpresa() { 
@@ -508,6 +545,7 @@
         }
 
         function addCar(id) {
+            if ('vibrate' in navigator) navigator.vibrate(40);
             const p = db.productos.find(x=>x.id===id); if(!p) return;
             const e = carritoWeb.find(x=>x.id===id);
             const stockMax = p.cantidad !== undefined ? p.cantidad : 999;
@@ -547,6 +585,20 @@
             else { mostrarToast('Sin WhatsApp configurado', 'bg-[#f59e0b]'); }
             
             guardarBD().catch(()=>{}); 
+        }
+
+        function compartirTienda() {
+            const shareData = {
+                title: db.config.nombreEmpresa || 'Mi Tienda',
+                text: `Mirá nuestro catálogo online con stock en vivo de ${db.config.nombreEmpresa}:`,
+                url: window.location.href
+            };
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                mostrarToast('¡Link del catálogo copiado!');
+            }
         }
 
         function renderStock() {
@@ -733,7 +785,42 @@
         function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
         function mostrarToast(m, c='bg-[#10b981]') { const co=document.getElementById('toast-container'), d=document.createElement('div'); d.className=`toast ${c} text-white text-xs`; d.innerHTML=m; co.appendChild(d); setTimeout(()=>{ d.style.animation='slideIn 0.3s reverse forwards'; setTimeout(()=>d.remove(),300); },3000); }
         
-        // Registro de Service Worker para PWA
+        // PWA Lógica de instalación y SW
+        let deferredPrompt = null;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!isStandalone) {
+                const banner = document.getElementById('pwa-install-banner');
+                if (banner) banner.classList.remove('hidden');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isIOS && !isStandalone) {
+                const banner = document.getElementById('pwa-install-banner');
+                if (banner) {
+                    banner.classList.remove('hidden');
+                    document.getElementById('btn-pwa-install').onclick = () => abrirModalUI('modal-ios-install');
+                }
+            }
+        });
+
+        function ejecutarInstalacionPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        document.getElementById('pwa-install-banner').classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').catch(err => console.error('PWA SW Error:', err));
