@@ -34,7 +34,6 @@
     
     <style>
         :root {
-            /* Tema Oliva & Siena por defecto */
             --bg-base: #F9F7F3; --bg-card: #FFFFFF; --bg-input: #F0EAD6;
             --text-main: #2C3523; --text-muted: #B87C51; --border-color: #E2DAC4;
             --accent-color: #6B705C; --accent-text: #FFFFFF; --pattern-color: #EAE3CC;
@@ -166,7 +165,6 @@
             <div class="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto w-full pt-16 md:pt-6">
                 
                 <div id="tab-catalogo" class="tab-content fade-in">
-                    <!-- ENCABEZADO Y BOTONERA SUPERIOR ORDENADA -->
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-borderline pb-4">
                         <div>
                             <h2 class="text-2xl font-bold text-main">Gestión de Catálogo</h2>
@@ -372,6 +370,13 @@
                     <div class="col-span-2"><label class="text-[9px] font-bold text-muted uppercase block mb-1">Categoría</label><input type="text" id="stock-cat" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-xs font-bold uppercase"></div>
                 </div>
                 <div><label class="text-[9px] font-bold text-muted uppercase block mb-1">Nombre de Producto</label><input type="text" id="stock-nombre" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-sm font-bold" required></div>
+                
+                <!-- NUEVO CAMPO DE DESCRIPCIÓN -->
+                <div>
+                    <label class="text-[9px] font-bold text-muted uppercase block mb-1">Descripción (Opcional - Máx 300 car.)</label>
+                    <textarea id="stock-desc" rows="2" maxlength="300" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-xs resize-none placeholder-muted" placeholder="Detalles, medidas, materiales..."></textarea>
+                </div>
+
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="text-[9px] font-bold text-accent uppercase block mb-1">Precio Final ($)</label><input type="number" id="stock-precio" class="w-full border border-borderline bg-input text-accent p-2.5 rounded-lg text-sm font-black focus:border-accent"></div>
                     <div><label class="text-[9px] font-bold text-muted uppercase block mb-1">Stock Opcional</label><input type="number" id="stock-cantidad" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-sm" value="999"></div>
@@ -612,7 +617,7 @@
             const t = elSearch ? elSearch.value.toLowerCase() : '';
             let arr = db.productos.filter(p => p.cantidad > 0);
             if(catActiva !== 'TODAS') arr = arr.filter(p => (p.categoria||'VARIOS') === catActiva);
-            if(t) arr = arr.filter(p => (p.nombre||'').toLowerCase().includes(t) || (p.sku||'').toLowerCase().includes(t));
+            if(t) arr = arr.filter(p => (p.nombre||'').toLowerCase().includes(t) || (p.sku||'').toLowerCase().includes(t) || (p.desc||'').toLowerCase().includes(t));
 
             const grid = document.getElementById('grid-productos-tienda');
             if(!grid) return;
@@ -625,7 +630,8 @@
                                     <span class="text-[9px] bg-input border border-borderline text-accent px-2 py-0.5 rounded font-bold uppercase">${p.categoria||'VAR'}</span>
                                     <span class="text-[9px] text-muted font-bold">${p.sku||''}</span>
                                 </div>
-                                <h4 class="text-sm font-bold text-main mb-3 line-clamp-2 leading-tight">${p.nombre}</h4>
+                                <h4 class="text-sm font-bold text-main ${p.desc ? 'mb-1' : 'mb-3'} line-clamp-2 leading-tight">${p.nombre}</h4>
+                                ${p.desc ? `<p class="text-[10px] text-muted line-clamp-2 leading-tight mb-2">${p.desc}</p>` : ''}
                                 <div class="mt-auto border-t border-borderline pt-3 flex justify-between items-end">
                                     <div><span class="text-[10px] font-bold text-muted block uppercase">Precio Final</span><span class="text-xl font-black text-accent">$${(p.precio||0).toLocaleString('es-AR')}</span></div>
                                     <button onclick="addCar('${p.id}')" class="bg-accent text-accenttext w-10 h-10 rounded-xl shadow-sm flex items-center justify-center hover:opacity-80 transition"><i class="fas fa-cart-plus"></i></button>
@@ -706,19 +712,44 @@
 
         function editP(id) {
             let p=db.productos.find(x=>x.id===id); if(!p) return;
-            document.getElementById('stock-id').value=p.id; document.getElementById('stock-sku').value=p.sku||''; document.getElementById('stock-cat').value=p.categoria||''; document.getElementById('stock-nombre').value=p.nombre; document.getElementById('stock-precio').value=p.precio; document.getElementById('stock-cantidad').value=p.cantidad; document.getElementById('modal-stock-title').innerText='Editar'; abrirModalUI('modal-stock');
+            document.getElementById('stock-id').value=p.id; 
+            document.getElementById('stock-sku').value=p.sku||''; 
+            document.getElementById('stock-cat').value=p.categoria||''; 
+            document.getElementById('stock-nombre').value=p.nombre; 
+            document.getElementById('stock-desc').value=p.desc||''; // Set description
+            document.getElementById('stock-precio').value=p.precio; 
+            document.getElementById('stock-cantidad').value=p.cantidad; 
+            document.getElementById('modal-stock-title').innerText='Editar'; 
+            abrirModalUI('modal-stock');
         }
-        function abrirModalStock() { document.getElementById('stock-id').value=''; document.getElementById('stock-sku').value=''; document.getElementById('stock-cat').value=''; document.getElementById('stock-nombre').value=''; document.getElementById('stock-precio').value=''; document.getElementById('stock-cantidad').value='999'; document.getElementById('modal-stock-title').innerText='Nuevo'; abrirModalUI('modal-stock'); }
+        function abrirModalStock() { 
+            document.getElementById('stock-id').value=''; 
+            document.getElementById('stock-sku').value=''; 
+            document.getElementById('stock-cat').value=''; 
+            document.getElementById('stock-nombre').value=''; 
+            document.getElementById('stock-desc').value=''; // Clear description
+            document.getElementById('stock-precio').value=''; 
+            document.getElementById('stock-cantidad').value='999'; 
+            document.getElementById('modal-stock-title').innerText='Nuevo'; 
+            abrirModalUI('modal-stock'); 
+        }
         
         function guardarStock() {
-            let id=document.getElementById('stock-id').value, s=document.getElementById('stock-sku').value, c=document.getElementById('stock-cat').value.toUpperCase()||'VARIOS', n=document.getElementById('stock-nombre').value, pr=parseFloat(document.getElementById('stock-precio').value)||0, cant=parseInt(document.getElementById('stock-cantidad').value)||0;
+            let id=document.getElementById('stock-id').value, 
+                s=document.getElementById('stock-sku').value, 
+                c=document.getElementById('stock-cat').value.toUpperCase()||'VARIOS', 
+                n=document.getElementById('stock-nombre').value, 
+                desc=document.getElementById('stock-desc').value.trim(), 
+                pr=parseFloat(document.getElementById('stock-precio').value)||0, 
+                cant=parseInt(document.getElementById('stock-cantidad').value)||0;
+                
             if(!n) return mostrarToast('Falta nombre', 'bg-red-600');
             
             if(id) { 
                 let p=db.productos.find(x=>x.id===id); 
-                p.sku=s; p.categoria=c; p.nombre=n; p.precio=pr; p.cantidad=cant; 
+                p.sku=s; p.categoria=c; p.nombre=n; p.desc=desc; p.precio=pr; p.cantidad=cant; 
             } else { 
-                db.productos.push({id:'id'+Date.now(), sku:s, categoria:c, nombre:n, precio:pr, cantidad:cant, imagenBase64:''}); 
+                db.productos.push({id:'id'+Date.now(), sku:s, categoria:c, nombre:n, desc:desc, precio:pr, cantidad:cant, imagenBase64:''}); 
             }
             
             cerrarModal('modal-stock'); renderStock(); renderCats(); mostrarToast('Guardado');
@@ -768,13 +799,13 @@
                 try {
                     let d = new Uint8Array(evt.target.result); let wb = XLSX.read(d, {type:'array'}); let sheet = wb.Sheets[wb.SheetNames[0]]; let json = XLSX.utils.sheet_to_json(sheet, {header:1});
                     let h = json[0].map(x=>String(x||'').toLowerCase().trim());
-                    let cs=h.findIndex(x=>x.includes('sku')||x.includes('cod')), cn=h.findIndex(x=>x.includes('nombre')||x.includes('producto')), cp=h.findIndex(x=>x.includes('precio')), ccat=h.findIndex(x=>x.includes('cat')), ccant=h.findIndex(x=>x.includes('stock'));
+                    let cs=h.findIndex(x=>x.includes('sku')||x.includes('cod')), cn=h.findIndex(x=>x.includes('nombre')||x.includes('producto')), cp=h.findIndex(x=>x.includes('precio')), ccat=h.findIndex(x=>x.includes('cat')), ccant=h.findIndex(x=>x.includes('stock')), cdesc=h.findIndex(x=>x.includes('desc'));
                     if(cn===-1 || cp===-1) throw new Error("Falta Nombre o Precio en el Excel");
                     for(let i=1; i<json.length; i++) {
                         let row=json[i]; if(!row || !row[cn]) continue;
-                        let sku=cs!==-1?String(row[cs]||'').trim():'', n=String(row[cn]).trim(), pr=parseFloat(String(row[cp]).replace(',','.'))||0, cat=ccat!==-1?String(row[ccat]||'').toUpperCase().trim():'VARIOS', cant=ccant!==-1?parseInt(row[ccant])||0:999;
+                        let sku=cs!==-1?String(row[cs]||'').trim():'', n=String(row[cn]).trim(), pr=parseFloat(String(row[cp]).replace(',','.'))||0, cat=ccat!==-1?String(row[ccat]||'').toUpperCase().trim():'VARIOS', cant=ccant!==-1?parseInt(row[ccant])||0:999, desc=cdesc!==-1?String(row[cdesc]||'').trim():'';
                         let ex = db.productos.find(x=>(sku&&x.sku===sku) || (x.nombre||'').toLowerCase()===n.toLowerCase());
-                        if(ex) { ex.precio=pr; ex.cantidad=cant; if(cat) ex.categoria=cat; } else db.productos.push({id:'id'+Date.now()+i, sku, categoria:cat, nombre:n, precio:pr, cantidad:cant, imagenBase64:''});
+                        if(ex) { ex.precio=pr; ex.cantidad=cant; if(cat) ex.categoria=cat; if(desc) ex.desc=desc; } else db.productos.push({id:'id'+Date.now()+i, sku, categoria:cat, nombre:n, desc:desc, precio:pr, cantidad:cant, imagenBase64:''});
                     }
                     renderStock(); renderCats();
                     document.getElementById('carga-overlay-global').style.display='none'; 
@@ -788,7 +819,7 @@
         function exportarExcel() {
             if(!db.productos || db.productos.length === 0) return mostrarToast('El catálogo está vacío', 'bg-orange-500');
             const dataToExport = db.productos.map(p => ({
-                SKU: p.sku || '', Categoría: p.categoria || 'VARIOS', Nombre: p.nombre || '', Precio: p.precio || 0, Stock: p.cantidad !== undefined ? p.cantidad : 999
+                SKU: p.sku || '', Categoría: p.categoria || 'VARIOS', Nombre: p.nombre || '', Descripción: p.desc || '', Precio: p.precio || 0, Stock: p.cantidad !== undefined ? p.cantidad : 999
             }));
             const ws = XLSX.utils.json_to_sheet(dataToExport); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Catálogo");
             XLSX.writeFile(wb, "Catalogo_Backup.xlsx");
@@ -946,7 +977,6 @@
         function abrirModalUI(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
         function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
         
-        // Ahora el toast hereda dinámicamente el color 'bg-accent' sin códigos duros, salvo error
         function mostrarToast(m, c='bg-accent') { const co=document.getElementById('toast-container'), d=document.createElement('div'); d.className=`toast ${c} text-accenttext text-xs`; d.innerHTML=m; co.appendChild(d); setTimeout(()=>{ d.style.animation='slideIn 0.3s reverse forwards'; setTimeout(()=>d.remove(),300); },3000); }
         
         let deferredPrompt = null;
