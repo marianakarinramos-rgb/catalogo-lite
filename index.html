@@ -1,11 +1,13 @@
-<!DOCTYPE html><html lang="es" data-theme="dark"><head>
+<!DOCTYPE html>
+<html lang="es" data-theme="oliva">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gesto Smart Lite - Catálogo Profesional</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#050b14">
+    <meta name="theme-color" content="#F9F7F3">
     <link rel="icon" type="image/png" sizes="192x192" href="/icono-192x192.png">
     <link rel="apple-touch-icon" href="/icono-192x192.png">
     
@@ -32,24 +34,30 @@
     
     <style>
         :root {
+            /* Tema Oliva & Siena por defecto */
+            --bg-base: #F9F7F3; --bg-card: #FFFFFF; --bg-input: #F0EAD6;
+            --text-main: #2C3523; --text-muted: #B87C51; --border-color: #E2DAC4;
+            --accent-color: #6B705C; --accent-text: #FFFFFF; --pattern-color: #EAE3CC;
+        }
+        [data-theme="estetica"] {
+            --bg-base: #FDFBFB; --bg-card: #FFFFFF; --bg-input: #FFFCBF;
+            --text-main: #3D2B2B; --text-muted: #758c64; --border-color: #EAE6BA;
+            --accent-color: #8F1717; --accent-text: #FFFFFF; --pattern-color: #F5F1D5;
+        }
+        [data-theme="oliva"] {
+            --bg-base: #F9F7F3; --bg-card: #FFFFFF; --bg-input: #F0EAD6;
+            --text-main: #2C3523; --text-muted: #B87C51; --border-color: #E2DAC4;
+            --accent-color: #6B705C; --accent-text: #FFFFFF; --pattern-color: #EAE3CC;
+        }
+        [data-theme="dark"] {
             --bg-base: #050b14; --bg-card: #161b22; --bg-input: #0d1117;
             --text-main: #ffffff; --text-muted: #8b949e; --border-color: #30363d;
-            --accent-color: #00bfff; --accent-text: #050b14; --pattern-color: #1e293b;
-        }
-        [data-theme="sky"] {
-            --bg-base: #f0f4f8; --bg-card: #ffffff; --bg-input: #f8fafc;
-            --text-main: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0;
-            --accent-color: #38bdf8; --accent-text: #ffffff; --pattern-color: #cbd5e1;
+            --accent-color: #758c64; --accent-text: #ffffff; --pattern-color: #1e293b;
         }
         [data-theme="rose"] {
             --bg-base: #fff1f2; --bg-card: #ffffff; --bg-input: #ffe4e6;
             --text-main: #4c0519; --text-muted: #9f1239; --border-color: #fecdd3;
             --accent-color: #fb7185; --accent-text: #ffffff; --pattern-color: #fecdd3;
-        }
-        [data-theme="mint"] {
-            --bg-base: #f0fdf4; --bg-card: #ffffff; --bg-input: #dcfce7;
-            --text-main: #022c22; --text-muted: #059669; --border-color: #bbf7d0;
-            --accent-color: #34d399; --accent-text: #ffffff; --pattern-color: #bbf7d0;
         }
 
         * { box-sizing: border-box; }
@@ -70,9 +78,6 @@
         .cargando-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 9999999; backdrop-filter: blur(5px); transition: opacity 0.3s ease; }
         .cargando-spinner { width: 40px; height: 40px; border: 4px solid var(--border-color); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .btn-excel { background-color: #10b981; color: #ffffff; transition: 0.2s; cursor: pointer; }
-        .btn-excel:hover { background-color: #059669; }
         
         input, select, textarea { background-color: var(--bg-input) !important; border-color: var(--border-color) !important; color: var(--text-main) !important; }
         input:focus, select:focus, textarea:focus { outline: none !important; border-color: var(--accent-color) !important; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1) !important; }
@@ -102,7 +107,6 @@
         .btn-theme:hover { opacity: 1; transform: scale(1.02); }
         .btn-theme.active { opacity: 1; border-color: var(--accent-color); box-shadow: 0 0 15px rgba(0,0,0,0.1); }
 
-        /* Estilos estrictos para impresión del PDF en Tarjetas Continuas sin Precios */
         @media print {
             body { background: #ffffff !important; background-image: none !important; color: #111827 !important; overflow: visible !important; }
             #erp-container, #toast-container, .cargando-overlay, #public-catalog, #pantalla-login { display: none !important; }
@@ -151,7 +155,7 @@
                     <a href="#" onclick="switchTab('tab-config', this)" class="tab-link flex items-center px-3 rounded-lg font-medium transition"><i class="fas fa-cog w-6"></i> Configuración</a>
                 </nav>
                 <div class="mt-2 pt-3 border-t border-borderline">
-                    <button onclick="abrirCatalogoEnNuevaPestana()" class="w-full bg-[#10b981] text-white py-2.5 rounded-lg font-bold transition text-xs hover:bg-[#34d399] mb-2 shadow-sm"><i class="fas fa-store mr-2"></i> Ver Mi Tienda</button>
+                    <button onclick="abrirCatalogoEnNuevaPestana()" class="w-full bg-accent text-accenttext py-2.5 rounded-lg font-bold transition text-xs hover:opacity-80 mb-2 shadow-sm"><i class="fas fa-store mr-2"></i> Ver Mi Tienda</button>
                     <button onclick="procesarLogout()" class="w-full bg-card border border-borderline text-muted py-2 rounded-lg font-bold transition text-xs hover:text-main"><i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión</button>
                 </div>
             </div>
@@ -173,20 +177,20 @@
                             <button onclick="abrirModalStock()" class="bg-accent text-accenttext px-3 py-2 rounded-lg font-bold text-xs shadow-sm hover:opacity-90 transition flex items-center">
                                 <i class="fas fa-plus mr-1.5"></i> Cargar
                             </button>
-                            <label class="btn-excel font-bold px-3 py-2 rounded-lg text-xs cursor-pointer shadow-sm transition flex items-center">
-                                <i class="fas fa-file-import mr-1.5"></i> Subir Excel
+                            <label class="bg-input text-main border border-borderline hover:bg-card font-bold px-3 py-2 rounded-lg text-xs cursor-pointer shadow-sm transition flex items-center">
+                                <i class="fas fa-file-import mr-1.5 text-accent"></i> Subir Excel
                                 <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importarExcel(event)">
                             </label>
-                            <button onclick="aumentoMasivo()" class="bg-[#f59e0b] hover:bg-[#d97706] text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center" title="Aumentar o rebajar precios por %">
+                            <button onclick="aumentoMasivo()" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center" title="Aumentar o rebajar precios por %">
                                 <i class="fas fa-percentage mr-1.5"></i> Ajustar %
                             </button>
-                            <button onclick="generarCatalogoPDF()" class="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
+                            <button onclick="generarCatalogoPDF()" class="bg-[#1e293b] hover:bg-black text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
                                 <i class="fas fa-file-pdf mr-1.5"></i> PDF Mayorista
                             </button>
-                            <button onclick="exportarExcel()" class="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
-                                <i class="fas fa-file-export mr-1.5"></i> Bajar Excel
+                            <button onclick="exportarExcel()" class="bg-card text-main border border-borderline hover:bg-input px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
+                                <i class="fas fa-file-export mr-1.5 text-accent"></i> Bajar Excel
                             </button>
-                            <button onclick="vaciarCatalogo()" class="bg-[#ef4444] hover:bg-[#dc2626] text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
+                            <button onclick="vaciarCatalogo()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
                                 <i class="fas fa-trash-alt mr-1.5"></i> Vaciar
                             </button>
                         </div>
@@ -234,15 +238,15 @@
                             <div class="bg-input p-6 rounded-2xl border border-borderline shadow-sm">
                                 <h3 class="text-sm font-bold text-accent mb-2 border-b border-borderline pb-2"><i class="fas fa-palette mr-2"></i> APARIENCIA</h3>
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-                                    <button onclick="cambiarTema('sky')" id="btn-theme-sky" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#f0f4f8] text-[#38bdf8] border-[#38bdf8]">Sky Pastel</button>
-                                    <button onclick="cambiarTema('dark')" id="btn-theme-dark" class="btn-theme active py-3 px-2 rounded-xl font-bold text-sm bg-[#050b14] text-[#00bfff] border-[#00bfff]">Dark Elegance</button>
+                                    <button onclick="cambiarTema('oliva')" id="btn-theme-oliva" class="btn-theme active py-3 px-2 rounded-xl font-bold text-sm bg-[#F0EAD6] text-[#6B705C] border-[#6B705C]">Oliva & Siena</button>
+                                    <button onclick="cambiarTema('estetica')" id="btn-theme-estetica" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#FFFCBF] text-[#8F1717] border-[#8F1717]">Estética Red</button>
+                                    <button onclick="cambiarTema('dark')" id="btn-theme-dark" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#050b14] text-[#758c64] border-[#758c64]">Dark Forest</button>
                                     <button onclick="cambiarTema('rose')" id="btn-theme-rose" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#fff1f2] text-[#fb7185] border-[#fb7185]">Rosé Glamour</button>
-                                    <button onclick="cambiarTema('mint')" id="btn-theme-mint" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#f0fdf4] text-[#34d399] border-[#34d399]">Mint Natural</button>
                                 </div>
                             </div>
                             
                             <div class="bg-input p-6 rounded-2xl border border-borderline shadow-sm">
-                                <h3 class="text-sm font-bold text-main mb-4 border-b border-borderline pb-2"><i class="fas fa-store text-[#10b981] mr-2"></i> Datos Públicos y Seguridad</h3>
+                                <h3 class="text-sm font-bold text-main mb-4 border-b border-borderline pb-2"><i class="fas fa-store text-accent mr-2"></i> Datos Públicos y Seguridad</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div><label class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-1">Nombre del Local</label><input type="text" id="conf-empresa-nombre" class="w-full border border-borderline p-3 rounded-xl bg-input text-main outline-none text-sm font-bold focus:border-accent"></div>
                                     <div><label class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-1">WhatsApp Recepción Pedidos</label><input type="text" id="conf-empresa-ws" class="w-full border border-borderline p-3 rounded-xl bg-input text-main outline-none text-sm font-bold focus:border-accent" placeholder="Ej: 5491100000000"></div>
@@ -262,11 +266,11 @@
                                                 <i class="fas fa-upload mr-2"></i> Subir Logo
                                                 <input type="file" accept="image/*" class="hidden" onchange="subirLogo(event)">
                                             </label>
-                                            <button onclick="borrarLogo()" class="text-[#ef4444] text-xs font-bold px-3 hover:underline hidden" id="btn-borrar-logo">Quitar Logo</button>
+                                            <button onclick="borrarLogo()" class="text-red-600 text-xs font-bold px-3 hover:underline hidden" id="btn-borrar-logo">Quitar Logo</button>
                                         </div>
                                     </div>
                                 </div>
-                                <button onclick="guardarInfoEmpresa()" class="w-full md:w-auto mt-4 bg-[#10b981] text-white py-3 px-6 rounded-xl font-bold shadow-sm hover:bg-[#34d399] transition text-sm"><i class="fas fa-save mr-2"></i> Guardar Configuración</button>
+                                <button onclick="guardarInfoEmpresa()" class="w-full md:w-auto mt-4 bg-accent text-accenttext py-3 px-6 rounded-xl font-bold shadow-sm hover:opacity-90 transition text-sm"><i class="fas fa-save mr-2"></i> Guardar Configuración</button>
                             </div>
                         </div>
                     </div>
@@ -301,7 +305,7 @@
                 </div>
                 <div>
                     <h1 id="store-name" class="text-xl font-bold text-main">Mi Tienda</h1>
-                    <span class="text-[10px] text-[#10b981] font-bold block"><i class="fas fa-check-circle mr-1"></i> Stock en Vivo</span>
+                    <span class="text-[10px] text-accent font-bold block"><i class="fas fa-check-circle mr-1"></i> Stock en Vivo</span>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -311,7 +315,7 @@
                 <button onclick="abrirLoginAdmin()" class="text-muted hover:text-main text-xs bg-card border border-borderline px-3 py-2 rounded-xl transition flex items-center gap-2 shadow-sm"><i class="fas fa-lock"></i></button>
                 <button onclick="abrirCarritoWeb()" class="relative text-main hover:text-accent text-2xl transition bg-card border border-borderline w-11 h-11 rounded-xl flex items-center justify-center shadow-sm">
                     <i class="fas fa-shopping-bag"></i>
-                    <span id="cart-badge" class="absolute -top-2 -right-2 bg-[#ef4444] text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                    <span id="cart-badge" class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
                 </button>
             </div>
         </header>
@@ -343,7 +347,7 @@
     <!-- MODALES CARRITO Y EDICION -->
     <div id="modal-carrito-web" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 backdrop-blur-sm z-[999999]">
         <div class="bg-card border border-borderline rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden fade-in flex flex-col max-h-[90vh]">
-            <div class="p-5 border-b border-borderline bg-input flex justify-between items-center"><h3 class="text-lg font-bold text-main"><i class="fas fa-shopping-cart text-accent mr-2"></i> Tu Pedido</h3><button onclick="cerrarModal('modal-carrito-web')" class="text-muted hover:text-[#ef4444] text-xl transition"><i class="fas fa-times"></i></button></div>
+            <div class="p-5 border-b border-borderline bg-input flex justify-between items-center"><h3 class="text-lg font-bold text-main"><i class="fas fa-shopping-cart text-accent mr-2"></i> Tu Pedido</h3><button onclick="cerrarModal('modal-carrito-web')" class="text-muted hover:text-red-600 text-xl transition"><i class="fas fa-times"></i></button></div>
             <div class="flex-grow overflow-y-auto p-4 space-y-3" id="lista-carrito-web"></div>
             <div class="p-5 bg-input border-t border-borderline space-y-3">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
@@ -351,8 +355,8 @@
                     <div><label class="text-[9px] font-bold text-muted uppercase block mb-1">Teléfono *</label><input type="text" id="web-cli-tel" class="w-full border border-borderline bg-card text-main p-2.5 rounded-lg outline-none focus:border-accent" required></div>
                     <div class="md:col-span-2"><label class="text-[9px] font-bold text-muted uppercase block mb-1">Dirección / Aclaraciones *</label><input type="text" id="web-cli-dir" class="w-full border border-borderline bg-card text-main p-2.5 rounded-lg outline-none focus:border-accent" required></div>
                 </div>
-                <div class="flex justify-between items-center pt-2 border-t border-borderline mt-2"><span class="text-muted font-bold uppercase text-xs">Total</span><h3 class="text-2xl font-black text-[#10b981]" id="total-carrito-web">$0</h3></div>
-                <button onclick="finalizarCompraWeb()" class="w-full bg-[#10b981] hover:bg-[#34d399] text-white py-3.5 rounded-xl font-bold shadow-md transition flex justify-center items-center text-sm mt-2"><i class="fab fa-whatsapp mr-2 text-lg"></i> Enviar Pedido por WhatsApp</button>
+                <div class="flex justify-between items-center pt-2 border-t border-borderline mt-2"><span class="text-muted font-bold uppercase text-xs">Total</span><h3 class="text-2xl font-black text-accent" id="total-carrito-web">$0</h3></div>
+                <button onclick="finalizarCompraWeb()" class="w-full bg-accent text-accenttext hover:opacity-90 py-3.5 rounded-xl font-bold shadow-md transition flex justify-center items-center text-sm mt-2"><i class="fab fa-whatsapp mr-2 text-lg"></i> Enviar Pedido por WhatsApp</button>
             </div>
         </div>
     </div>
@@ -360,7 +364,7 @@
     <!-- MODAL EDICION PRODUCTO -->
     <div id="modal-stock" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 backdrop-blur-sm z-[999998]">
         <div class="bg-card border border-borderline rounded-3xl w-full max-w-md shadow-2xl p-6 fade-in">
-            <div class="flex justify-between items-center mb-4 border-b border-borderline pb-3"><h3 class="font-bold text-main text-base" id="modal-stock-title">Artículo</h3><button onclick="cerrarModal('modal-stock')" class="text-muted hover:text-[#ef4444]"><i class="fas fa-times text-lg"></i></button></div>
+            <div class="flex justify-between items-center mb-4 border-b border-borderline pb-3"><h3 class="font-bold text-main text-base" id="modal-stock-title">Artículo</h3><button onclick="cerrarModal('modal-stock')" class="text-muted hover:text-red-600"><i class="fas fa-times text-lg"></i></button></div>
             <input type="hidden" id="stock-id">
             <div class="space-y-3">
                 <div class="grid grid-cols-3 gap-2">
@@ -369,11 +373,11 @@
                 </div>
                 <div><label class="text-[9px] font-bold text-muted uppercase block mb-1">Nombre de Producto</label><input type="text" id="stock-nombre" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-sm font-bold" required></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="text-[9px] font-bold text-[#10b981] uppercase block mb-1">Precio Final ($)</label><input type="number" id="stock-precio" class="w-full border border-[#10b981]/50 bg-input text-[#10b981] p-2.5 rounded-lg text-sm font-black"></div>
+                    <div><label class="text-[9px] font-bold text-accent uppercase block mb-1">Precio Final ($)</label><input type="number" id="stock-precio" class="w-full border border-borderline bg-input text-accent p-2.5 rounded-lg text-sm font-black focus:border-accent"></div>
                     <div><label class="text-[9px] font-bold text-muted uppercase block mb-1">Stock Opcional</label><input type="number" id="stock-cantidad" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-sm" value="999"></div>
                 </div>
             </div>
-            <div class="flex gap-2 mt-6"><button onclick="cerrarModal('modal-stock')" class="flex-1 bg-input text-muted py-2.5 rounded-lg font-bold text-xs">Cancelar</button><button onclick="guardarStock()" class="flex-1 bg-accent text-accenttext py-2.5 rounded-lg font-bold text-xs shadow-sm">Guardar</button></div>
+            <div class="flex gap-2 mt-6"><button onclick="cerrarModal('modal-stock')" class="flex-1 bg-input text-muted py-2.5 rounded-lg font-bold text-xs hover:bg-card">Cancelar</button><button onclick="guardarStock()" class="flex-1 bg-accent text-accenttext py-2.5 rounded-lg font-bold text-xs shadow-sm hover:opacity-90">Guardar</button></div>
         </div>
     </div>
 
@@ -398,7 +402,8 @@
         let db = { config: {}, usuarios: [], productos: [] };
         
         function verificarIntegridadDB() {
-            if(!db.config) db.config = { nombreEmpresa: 'Mi Tienda', whatsappTurnos: '', tema: 'dark', logoBase64: '', pinAdmin: '1234' };
+            if(!db.config) db.config = { nombreEmpresa: 'Mi Tienda', whatsappTurnos: '', tema: 'oliva', logoBase64: '', pinAdmin: '1234' };
+            if(!db.config.tema) db.config.tema = 'oliva';
             if(!db.config.pinAdmin) db.config.pinAdmin = '1234';
             if(!db.usuarios || db.usuarios.length===0) db.usuarios = [ { id: 'admin', nombre: 'Admin', pin: '1234' } ];
             if(!Array.isArray(db.productos)) db.productos = [];
@@ -559,7 +564,7 @@
             if(nuevoPin && nuevoPin.length === 4) {
                 db.config.pinAdmin = nuevoPin;
             } else if (nuevoPin) {
-                mostrarToast('El PIN debe tener 4 dígitos', 'bg-[#ef4444]');
+                mostrarToast('El PIN debe tener 4 dígitos', 'bg-red-600');
                 return;
             }
 
@@ -576,10 +581,10 @@
                 const base64 = await comprimirImagenAsincrona(file, 250);
                 db.config.logoBase64 = base64;
                 aplicarConfiguracion();
-                mostrarToast('Logo actualizado', 'bg-[#10b981]');
+                mostrarToast('Logo actualizado');
                 guardarBD();
             } catch(err) { 
-                mostrarToast('Error al procesar logo', 'bg-[#ef4444]'); 
+                mostrarToast('Error al procesar logo', 'bg-red-600'); 
             } finally {
                 document.getElementById('carga-overlay-global').style.display = 'none';
             }
@@ -612,7 +617,7 @@
             const grid = document.getElementById('grid-productos-tienda');
             if(!grid) return;
             grid.innerHTML = arr.length ? arr.map(p => {
-                const img = (p.imagenBase64 && p.imagenBase64.length > 50) ? p.imagenBase64 : 'https://via.placeholder.com/300/1e293b/8b949e?text=Tienda';
+                const img = (p.imagenBase64 && p.imagenBase64.length > 50) ? p.imagenBase64 : 'https://via.placeholder.com/300/FDFBFB/B87C51?text=Tienda';
                 return `<div class="product-card">
                             <img src="${img}" class="product-image" loading="lazy">
                             <div class="p-4 flex flex-col flex-grow">
@@ -635,11 +640,12 @@
             const p = db.productos.find(x=>x.id===id); if(!p) return;
             const e = carritoWeb.find(x=>x.id===id);
             const stockMax = p.cantidad !== undefined ? p.cantidad : 999;
-            if(e) { if(e.cant < stockMax) e.cant++; else mostrarToast('Stock máximo'); } else carritoWeb.push({id:p.id, n:p.nombre, p:p.precio, cant:1});
+            if(e) { if(e.cant < stockMax) e.cant++; else mostrarToast('Stock máximo', 'bg-orange-500'); } else carritoWeb.push({id:p.id, n:p.nombre, p:p.precio, cant:1});
             updBadge(); mostrarToast('Agregado');
         }
         function updBadge() { const b = document.getElementById('cart-badge'); if(!b) return; const t = carritoWeb.reduce((s,i)=>s+i.cant,0); b.innerText=t; b.classList.toggle('hidden', t===0); }
         function modCar(i, d) { carritoWeb[i].cant+=d; if(carritoWeb[i].cant<=0) carritoWeb.splice(i,1); updBadge(); abrirCarritoWeb(); }
+        
         function abrirCarritoWeb() {
             const l = document.getElementById('lista-carrito-web'); let t=0;
             l.innerHTML = carritoWeb.length ? carritoWeb.map((x, i) => {
@@ -653,7 +659,7 @@
         function finalizarCompraWeb() {
             if(!carritoWeb.length) return;
             const n=document.getElementById('web-cli-nombre').value, tel=document.getElementById('web-cli-tel').value, d=document.getElementById('web-cli-dir').value;
-            if(!n || !tel || !d) return mostrarToast('Completá los datos', 'bg-[#ef4444]');
+            if(!n || !tel || !d) return mostrarToast('Completá los datos', 'bg-red-600');
             let m=`Hola! Pedido ${db.config.nombreEmpresa}:\n\n`; let tot=0;
             
             carritoWeb.forEach(x=>{ 
@@ -668,7 +674,7 @@
             
             const phone = db.config.whatsappTurnos;
             if(phone) { window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(m)}`; } 
-            else { mostrarToast('Sin WhatsApp configurado', 'bg-[#f59e0b]'); }
+            else { mostrarToast('Sin WhatsApp configurado', 'bg-orange-500'); }
             
             guardarBD().catch(()=>{}); 
         }
@@ -694,7 +700,7 @@
             b.innerHTML = a.map(p=>{
                 const i = (p.imagenBase64 && p.imagenBase64.length > 50) ? p.imagenBase64 : "";
                 const im = i ? `<img src="${i}" class="w-10 h-10 object-cover rounded bg-input border border-borderline">` : `<div class="w-10 h-10 rounded bg-input flex items-center justify-center text-muted border border-borderline"><i class="fas fa-image text-[10px]"></i></div>`;
-                return `<tr><td class="py-2 px-4"><label class="cursor-pointer block relative"><input type="file" accept="image/*" class="hidden" onchange="procesarImagenIndividual(event, '${p.id}')">${im}</label></td><td class="py-2 px-4 font-bold text-muted text-[11px]">${p.sku||''}</td><td class="py-2 px-4 font-bold text-accent text-[10px]">${p.categoria||'VAR'}</td><td class="py-2 px-4 font-bold text-main text-xs line-clamp-1">${p.nombre}</td><td class="py-2 px-4 text-center font-black ${p.cantidad <= 0 ? 'text-[#ef4444]' : 'text-main'} text-sm">${p.cantidad}</td><td class="py-2 px-4 text-right font-black text-[#10b981] text-xs">$${(p.precio||0).toLocaleString('es-AR')}</td><td class="py-2 px-4 text-center"><button onclick="editP('${p.id}')" class="text-accent mx-1"><i class="fas fa-edit"></i></button><button onclick="delP('${p.id}')" class="text-[#ef4444] mx-1"><i class="fas fa-trash"></i></button></td></tr>`;
+                return `<tr><td class="py-2 px-4"><label class="cursor-pointer block relative"><input type="file" accept="image/*" class="hidden" onchange="procesarImagenIndividual(event, '${p.id}')">${im}</label></td><td class="py-2 px-4 font-bold text-muted text-[11px]">${p.sku||''}</td><td class="py-2 px-4 font-bold text-accent text-[10px]">${p.categoria||'VAR'}</td><td class="py-2 px-4 font-bold text-main text-xs line-clamp-1">${p.nombre}</td><td class="py-2 px-4 text-center font-black ${p.cantidad <= 0 ? 'text-red-600' : 'text-main'} text-sm">${p.cantidad}</td><td class="py-2 px-4 text-right font-black text-accent text-xs">$${(p.precio||0).toLocaleString('es-AR')}</td><td class="py-2 px-4 text-center"><button onclick="editP('${p.id}')" class="text-accent mx-1"><i class="fas fa-edit"></i></button><button onclick="delP('${p.id}')" class="text-red-600 mx-1"><i class="fas fa-trash"></i></button></td></tr>`;
             }).join('');
         }
 
@@ -706,7 +712,7 @@
         
         function guardarStock() {
             let id=document.getElementById('stock-id').value, s=document.getElementById('stock-sku').value, c=document.getElementById('stock-cat').value.toUpperCase()||'VARIOS', n=document.getElementById('stock-nombre').value, pr=parseFloat(document.getElementById('stock-precio').value)||0, cant=parseInt(document.getElementById('stock-cantidad').value)||0;
-            if(!n) return mostrarToast('Falta nombre');
+            if(!n) return mostrarToast('Falta nombre', 'bg-red-600');
             
             if(id) { 
                 let p=db.productos.find(x=>x.id===id); 
@@ -731,12 +737,11 @@
             if(confirm('⚠️ ¿Borrar TODOS los productos de la base de datos?')) { 
                 db.productos=[]; 
                 renderStock(); renderCats(); 
-                mostrarToast('Catálogo Vaciado', 'bg-[#ef4444]');
+                mostrarToast('Catálogo Vaciado', 'bg-red-600');
                 guardarBD();
             } 
         }
 
-        // ================= AJUSTE MASIVO DE PRECIOS (+ O - %) =================
         function aumentoMasivo() {
             let pct = prompt("Modificación porcentual de precios:\n• Ingresá un número positivo para aumentar (Ej: 10 para +10%)\n• Ingresá un número negativo para bajar o corregir (Ej: -3 para -3%)");
             if(pct !== null && pct.trim() !== "" && !isNaN(pct)) { 
@@ -749,7 +754,7 @@
                 }); 
                 renderStock(); 
                 renderTiendaWeb(); 
-                mostrarToast(pNum >= 0 ? `Precios aumentados +${pNum}%` : `Precios rebajados ${pNum}%`, 'bg-[#f59e0b]'); 
+                mostrarToast(pNum >= 0 ? `Precios aumentados +${pNum}%` : `Precios rebajados ${pNum}%`, 'bg-orange-500'); 
                 guardarBD();
             }
         }
@@ -776,12 +781,12 @@
                     e.target.value=''; 
                     mostrarToast("Excel Procesado");
                     guardarBD();
-                } catch(err) { mostrarToast(err.message, 'bg-[#ef4444]'); document.getElementById('carga-overlay-global').style.display='none'; e.target.value=''; } 
+                } catch(err) { mostrarToast(err.message, 'bg-red-600'); document.getElementById('carga-overlay-global').style.display='none'; e.target.value=''; } 
             }; r.readAsArrayBuffer(f);
         }
 
         function exportarExcel() {
-            if(!db.productos || db.productos.length === 0) return mostrarToast('El catálogo está vacío', 'bg-[#f59e0b]');
+            if(!db.productos || db.productos.length === 0) return mostrarToast('El catálogo está vacío', 'bg-orange-500');
             const dataToExport = db.productos.map(p => ({
                 SKU: p.sku || '', Categoría: p.categoria || 'VARIOS', Nombre: p.nombre || '', Precio: p.precio || 0, Stock: p.cantidad !== undefined ? p.cantidad : 999
             }));
@@ -790,24 +795,20 @@
             mostrarToast('Excel descargado con éxito');
         }
 
-        // ================= CATÁLOGO PDF: GRILLA UNIFICADA SIN PRECIOS =================
         function generarCatalogoPDF() {
-            if(!db.productos || db.productos.length === 0) return mostrarToast('El catálogo está vacío', 'bg-[#f59e0b]');
+            if(!db.productos || db.productos.length === 0) return mostrarToast('El catálogo está vacío', 'bg-orange-500');
             
             const previewContainer = document.getElementById('pdf-mayorista-preview');
             const fechaActual = new Date().toLocaleDateString('es-AR');
             
             let htmlContent = `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 900px; margin: 0 auto; padding: 15px;">
-                    <!-- ENCABEZADO -->
                     <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 20px;">
                         <div>
                             <h1 style="margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase; color: #0f172a; letter-spacing: 1px;">Catálogo Mayorista</h1>
                             <p style="margin: 3px 0 0 0; font-size: 10px; color: #64748b; font-weight: 600;">Actualizado al ${fechaActual} • Listo para reventa</p>
                         </div>
                     </div>
-                    
-                    <!-- GRILLA UNIFICADA DE PRODUCTOS -->
                     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             `;
 
@@ -854,7 +855,7 @@
                 p.imagenBase64 = await comprimirImagenAsincrona(file); 
                 renderStock(); 
                 document.getElementById('carga-overlay-global').style.display = 'none'; 
-                mostrarToast('Foto subida', 'bg-[#10b981]');
+                mostrarToast('Foto subida');
                 guardarBD();
             } catch (err) { document.getElementById('carga-overlay-global').style.display = 'none'; } 
         }
@@ -894,7 +895,7 @@
             renderStock(); 
             document.getElementById('carga-overlay-global').style.display = 'none'; 
             document.getElementById('input-imagenes-catalogo').value = ''; 
-            mostrarToast(`${vinculadas} fotos vinculadas.`, 'bg-[#10b981]'); 
+            mostrarToast(`${vinculadas} fotos vinculadas.`); 
             guardarBD();
         }
 
@@ -936,7 +937,7 @@
                 document.body.classList.remove('modo-tienda-activa'); 
                 actualizarUI(); 
             } else {
-                mostrarToast('PIN Incorrecto', 'bg-[#ef4444]');
+                mostrarToast('PIN Incorrecto', 'bg-red-600');
             }
         }
 
@@ -944,7 +945,9 @@
         function switchTab(t, el) { document.querySelectorAll('.tab-content').forEach(x=>x.classList.add('hidden')); document.querySelectorAll('.tab-link').forEach(x=>x.classList.remove('active')); document.getElementById(t).classList.remove('hidden'); el.classList.add('active'); }
         function abrirModalUI(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
         function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
-        function mostrarToast(m, c='bg-[#10b981]') { const co=document.getElementById('toast-container'), d=document.createElement('div'); d.className=`toast ${c} text-white text-xs`; d.innerHTML=m; co.appendChild(d); setTimeout(()=>{ d.style.animation='slideIn 0.3s reverse forwards'; setTimeout(()=>d.remove(),300); },3000); }
+        
+        // Ahora el toast hereda dinámicamente el color 'bg-accent' sin códigos duros, salvo error
+        function mostrarToast(m, c='bg-accent') { const co=document.getElementById('toast-container'), d=document.createElement('div'); d.className=`toast ${c} text-accenttext text-xs`; d.innerHTML=m; co.appendChild(d); setTimeout(()=>{ d.style.animation='slideIn 0.3s reverse forwards'; setTimeout(()=>d.remove(),300); },3000); }
         
         let deferredPrompt = null;
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
