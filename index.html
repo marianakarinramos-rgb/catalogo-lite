@@ -220,7 +220,7 @@
                         <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr class="bg-input border-b border-borderline text-[10px] text-muted font-bold uppercase tracking-widest">
-                                    <th class="py-4 px-4 w-16">Foto</th>
+                                    <th class="py-4 px-4 w-24">Foto</th>
                                     <th class="py-4 px-4 w-24">SKU</th>
                                     <th class="py-4 px-4 w-32">Categoría</th>
                                     <th class="py-4 px-4">Producto</th>
@@ -347,7 +347,13 @@
             <button onclick="cerrarModal('modal-quick-view')" class="absolute top-4 right-4 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition shadow-md z-10">
                 <i class="fas fa-times"></i>
             </button>
-            <img id="qv-img" src="" class="w-full h-64 md:h-80 object-cover bg-white">
+            <!-- CONTENEDOR FOTO CON LUPA UX -->
+            <div class="relative w-full h-64 md:h-80 bg-white group cursor-pointer" onclick="verImagenFull(document.getElementById('qv-img').src)" title="Hacer clic para ampliar">
+                <img id="qv-img" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/20 hidden group-hover:flex items-center justify-center transition">
+                    <i class="fas fa-search-plus text-white text-4xl drop-shadow-lg opacity-90"></i>
+                </div>
+            </div>
             <div class="p-6 flex flex-col gap-3">
                 <div class="flex justify-between items-start gap-4">
                     <div>
@@ -362,6 +368,12 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- MODAL VISOR IMAGEN FULLSCREEN (LIGHTBOX) -->
+    <div id="modal-visor-imagen" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[9999999] backdrop-blur-md transition-opacity p-2" onclick="cerrarModal('modal-visor-imagen')">
+        <button class="absolute top-6 right-6 text-white/80 text-4xl hover:text-white transition z-10"><i class="fas fa-times"></i></button>
+        <img id="visor-img-src" src="" class="max-w-[95vw] max-h-[90vh] object-contain rounded-xl shadow-2xl" onclick="event.stopPropagation()">
     </div>
 
     <!-- MODAL INSTALACIÓN IOS -->
@@ -433,10 +445,12 @@
             appId: "TU_APP_ID"
         };
 
-        let firestoreDb = null; let esModoNube = false; let firebaseLoaded = false;
+        let firestoreDb = null; 
+        let esModoNube = false; // ESTÁ EN FALSE PARA GRABAR LA DEMO TRANQUILA
+        let firebaseLoaded = false;
         let isUploading = false; 
 
-        try { if (typeof firebase !== 'undefined') { firebase.initializeApp(firebaseConfig); firestoreDb = firebase.firestore(); esModoNube = true; } } catch(err) {}
+        try { if (typeof firebase !== 'undefined') { firebase.initializeApp(firebaseConfig); firestoreDb = firebase.firestore(); } } catch(err) {}
 
         let db = { config: {}, usuarios: [], productos: [] };
         
@@ -459,6 +473,13 @@
         const debouncedRenderTienda = debounce(() => renderTiendaWeb(), 200);
         const isTiendaWeb = window.location.href.toLowerCase().includes('modo=tienda');
 
+        // VISOR FULLSCREEN
+        function verImagenFull(src) {
+            if(!src || src.includes('text=Tienda') || src.includes('placeholder')) return;
+            document.getElementById('visor-img-src').src = src;
+            abrirModalUI('modal-visor-imagen');
+        }
+
         function guardarBD() {
             return new Promise((resolve) => {
                 isUploading = true;
@@ -478,7 +499,6 @@
             try { localStorage.setItem('catalogo_plantilla_maestra', JSON.stringify(baseData)); } catch(e) {}
         }
 
-        // LÓGICA DEL BOTÓN FLOTANTE "SUBIR"
         document.addEventListener('DOMContentLoaded', () => {
             const catalogo = document.getElementById('public-catalog');
             const btnSubir = document.getElementById('btn-subir-top');
@@ -767,14 +787,33 @@
             }
         }
 
+        // TABLA ADMIN MODIFICADA PARA SEPARAR EL ZOOM DE LA SUBIDA DE FOTO
         function renderStock() {
             const b = document.getElementById('lista-stock-tabla'); if(!b) return;
             const s = document.getElementById('buscador-stock').value.toLowerCase();
             let a = s ? db.productos.filter(p=>p.nombre.toLowerCase().includes(s)||p.sku.toLowerCase().includes(s)||p.categoria.toLowerCase().includes(s)) : db.productos;
             b.innerHTML = a.map(p=>{
                 const i = (p.imagenBase64 && p.imagenBase64.length > 50) ? p.imagenBase64 : "";
-                const im = i ? `<img src="${i}" class="w-10 h-10 object-cover rounded bg-input border border-borderline">` : `<div class="w-10 h-10 rounded bg-input flex items-center justify-center text-muted border border-borderline"><i class="fas fa-image text-[10px]"></i></div>`;
-                return `<tr><td class="py-2 px-4"><label class="cursor-pointer block relative"><input type="file" accept="image/*" class="hidden" onchange="procesarImagenIndividual(event, '${p.id}')">${im}</label></td><td class="py-2 px-4 font-bold text-muted text-[11px]">${p.sku||''}</td><td class="py-2 px-4 font-bold text-accent text-[10px]">${p.categoria||'VAR'}</td><td class="py-2 px-4 font-bold text-main text-xs line-clamp-1">${p.nombre}</td><td class="py-2 px-4 text-center font-black ${p.cantidad <= 0 ? 'text-red-600' : 'text-main'} text-sm">${p.cantidad}</td><td class="py-2 px-4 text-right font-black text-accent text-xs">$${(p.precio||0).toLocaleString('es-AR')}</td><td class="py-2 px-4 text-center"><button onclick="editP('${p.id}')" class="text-accent mx-1"><i class="fas fa-edit"></i></button><button onclick="delP('${p.id}')" class="text-red-600 mx-1"><i class="fas fa-trash"></i></button></td></tr>`;
+                const im = i ? `<img src="${i}" onclick="verImagenFull('${i}')" class="w-10 h-10 object-cover rounded bg-input border border-borderline cursor-pointer hover:opacity-80 transition" title="Ver foto">` : `<div class="w-10 h-10 rounded bg-input flex items-center justify-center text-muted border border-borderline"><i class="fas fa-image text-[10px]"></i></div>`;
+                
+                return `<tr>
+                    <td class="py-2 px-4 flex items-center gap-2">
+                        ${im}
+                        <label class="cursor-pointer bg-card border border-borderline text-muted w-7 h-7 rounded flex items-center justify-center shadow-sm hover:text-accent hover:border-accent transition" title="Cambiar foto">
+                            <i class="fas fa-camera text-[11px]"></i>
+                            <input type="file" accept="image/*" class="hidden" onchange="procesarImagenIndividual(event, '${p.id}')">
+                        </label>
+                    </td>
+                    <td class="py-2 px-4 font-bold text-muted text-[11px]">${p.sku||''}</td>
+                    <td class="py-2 px-4 font-bold text-accent text-[10px]">${p.categoria||'VAR'}</td>
+                    <td class="py-2 px-4 font-bold text-main text-xs line-clamp-1">${p.nombre}</td>
+                    <td class="py-2 px-4 text-center font-black ${p.cantidad <= 0 ? 'text-red-600' : 'text-main'} text-sm">${p.cantidad}</td>
+                    <td class="py-2 px-4 text-right font-black text-accent text-xs">$${(p.precio||0).toLocaleString('es-AR')}</td>
+                    <td class="py-2 px-4 text-center">
+                        <button onclick="editP('${p.id}')" class="text-accent mx-1 hover:scale-110 transition"><i class="fas fa-edit"></i></button>
+                        <button onclick="delP('${p.id}')" class="text-red-600 mx-1 hover:scale-110 transition"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
             }).join('');
         }
 
