@@ -58,6 +58,22 @@
             --text-main: #4c0519; --text-muted: #9f1239; --border-color: #fecdd3;
             --accent-color: #fb7185; --accent-text: #ffffff; --pattern-color: #fecdd3;
         }
+        /* NUEVAS PALETAS */
+        [data-theme="frutal"] {
+            --bg-base: #FDF9F9; --bg-card: #FFFFFF; --bg-input: #F3BFC1;
+            --text-main: #4A3320; --text-muted: #D0BC62; --border-color: #F8D8D9;
+            --accent-color: #DE7A25; --accent-text: #FFFFFF; --pattern-color: #FAEDED;
+        }
+        [data-theme="arcilla"] {
+            --bg-base: #FCFBF8; --bg-card: #FFFFFF; --bg-input: #EBD89A;
+            --text-main: #3D2D29; --text-muted: #BDA8D1; --border-color: #F2E5BA;
+            --accent-color: #BF8A7C; --accent-text: #FFFFFF; --pattern-color: #F7F1D9;
+        }
+        [data-theme="noche"] {
+            --bg-base: #0B1422; --bg-card: #162945; --bg-input: #1C3356;
+            --text-main: #F0F4F8; --text-muted: #83A1B9; --border-color: #254473;
+            --accent-color: #682242; --accent-text: #FFFFFF; --pattern-color: #112036;
+        }
 
         * { box-sizing: border-box; }
         body { background-color: var(--bg-base); background-image: radial-gradient(circle, var(--pattern-color) 1.5px, transparent 1.5px); background-size: 30px 30px; color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; overflow: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
@@ -242,11 +258,16 @@
                         <div class="space-y-6">
                             <div class="bg-input p-6 rounded-2xl border border-borderline shadow-sm">
                                 <h3 class="text-sm font-bold text-accent mb-2 border-b border-borderline pb-2"><i class="fas fa-palette mr-2"></i> APARIENCIA</h3>
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 mt-4">
                                     <button onclick="cambiarTema('oliva')" id="btn-theme-oliva" class="btn-theme active py-3 px-2 rounded-xl font-bold text-sm bg-[#F0EAD6] text-[#6B705C] border-[#6B705C]">Oliva & Siena</button>
                                     <button onclick="cambiarTema('estetica')" id="btn-theme-estetica" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#FFFCBF] text-[#8F1717] border-[#8F1717]">Estética Red</button>
                                     <button onclick="cambiarTema('dark')" id="btn-theme-dark" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#050b14] text-[#758c64] border-[#758c64]">Dark Forest</button>
                                     <button onclick="cambiarTema('rose')" id="btn-theme-rose" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#fff1f2] text-[#fb7185] border-[#fb7185]">Rosé Glamour</button>
+                                    
+                                    <!-- NUEVOS BOTONES DE PALETAS -->
+                                    <button onclick="cambiarTema('frutal')" id="btn-theme-frutal" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#F3BFC1] text-[#DE7A25] border-[#DE7A25]">Frutal Pastel</button>
+                                    <button onclick="cambiarTema('arcilla')" id="btn-theme-arcilla" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#EBD89A] text-[#BF8A7C] border-[#BF8A7C]">Arcilla Suave</button>
+                                    <button onclick="cambiarTema('noche')" id="btn-theme-noche" class="btn-theme py-3 px-2 rounded-xl font-bold text-sm bg-[#162945] text-[#83A1B9] border-[#83A1B9]">Noche Profunda</button>
                                 </div>
                             </div>
                             
