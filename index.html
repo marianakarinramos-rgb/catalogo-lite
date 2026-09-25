@@ -121,6 +121,7 @@
     </style>
 </head>
 <body class="h-screen w-full">
+    <!-- PANTALLA DE CARGA -->
     <div id="carga-overlay-global" class="cargando-overlay flex flex-col hidden" style="display:none;">
         <div class="text-center">
             <div class="cargando-spinner mx-auto mb-4"></div>
@@ -128,6 +129,7 @@
         </div>
     </div>
 
+    <!-- PANTALLA LOGIN ADMIN -->
     <div id="pantalla-login" class="fixed inset-0 bg-base z-[99999] hidden flex-col items-center justify-center p-4">
         <div class="bg-card border border-borderline rounded-3xl p-8 max-w-sm w-full text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] fade-in relative overflow-hidden">
             <div class="absolute top-0 right-0 w-2 h-full bg-accent"></div>
@@ -145,6 +147,7 @@
         </div>
     </div>
 
+    <!-- CONTENEDOR ADMIN -->
     <div id="erp-container" class="hidden flex-col md:flex-row h-screen w-full">
         <div class="fixed top-0 left-0 right-0 z-30 md:hidden bg-input border-b border-borderline text-main px-4 py-3 flex items-center justify-between">
             <span class="text-sm font-bold text-muted">Gesto Smart Lite</span>
@@ -167,6 +170,7 @@
             <div id="toast-container"></div>
             <div class="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto w-full pt-16 md:pt-6">
                 
+                <!-- TAB CATÁLOGO -->
                 <div id="tab-catalogo" class="tab-content fade-in">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-borderline pb-4">
                         <div>
@@ -182,7 +186,7 @@
                                 <i class="fas fa-file-import mr-1.5 text-accent"></i> Subir Excel
                                 <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importarExcel(event)">
                             </label>
-                            <button onclick="aumentoMasivo()" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
+                            <button onclick="aumentoMasivo()" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center" title="Aumentar o rebajar precios por %">
                                 <i class="fas fa-percentage mr-1.5"></i> Ajustar %
                             </button>
                             <button onclick="generarCatalogoPDF()" class="bg-[#1e293b] hover:bg-black text-white px-3 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center">
@@ -230,10 +234,11 @@
                     </div>
                 </div>
 
+                <!-- TAB CONFIGURACIÓN -->
                 <div id="tab-config" class="tab-content hidden fade-in">
                     <div class="max-w-4xl mx-auto bg-card/90 backdrop-blur rounded-3xl shadow-md border border-borderline p-6 md:p-8">
                         <h2 class="text-2xl font-bold text-main mb-1">Configuración de la Tienda</h2>
-                        <p class="text-muted text-sm mb-8">Personalizá tu marca, elegí el diseño y gestioná tus accesos.</p>
+                        <p class="text-muted text-sm mb-8">Personalizá tu marca, construí la cara de tu negocio y gestioná tus accesos.</p>
                         
                         <div class="space-y-6">
                             <div class="bg-input p-6 rounded-2xl border border-borderline shadow-sm">
@@ -257,6 +262,7 @@
                                         <input type="password" id="conf-empresa-pin" maxlength="4" class="w-full md:w-1/2 border border-borderline p-3 rounded-xl bg-input text-main outline-none text-sm font-bold focus:border-accent" placeholder="1234">
                                     </div>
 
+                                    <!-- SECCIÓN LOGO -->
                                     <div class="md:col-span-2 pt-4 border-t border-borderline mt-2">
                                         <label class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-2">Logo de la Tienda (Opcional)</label>
                                         <div class="flex items-center gap-3">
@@ -268,6 +274,22 @@
                                                 <input type="file" accept="image/*" class="hidden" onchange="subirLogo(event)">
                                             </label>
                                             <button onclick="borrarLogo()" class="text-red-600 text-xs font-bold px-3 hover:underline hidden" id="btn-borrar-logo">Quitar Logo</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- SECCIÓN BANNER -->
+                                    <div class="md:col-span-2 pt-4 border-t border-borderline mt-2">
+                                        <label class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-1">Banner Principal (Opcional)</label>
+                                        <p class="text-[10px] text-muted mb-3 leading-tight">Agregá un diseño apaisado para darle identidad a tu vitrina. Si no subís nada, simplemente no se muestra.</p>
+                                        <div class="flex items-center gap-3">
+                                            <div id="preview-banner" class="w-24 h-14 rounded-xl bg-card border border-borderline flex items-center justify-center overflow-hidden shadow-sm">
+                                                <i class="fas fa-image text-muted text-xl"></i>
+                                            </div>
+                                            <label class="bg-input text-main border border-borderline font-bold px-4 py-2.5 rounded-xl shadow-sm flex items-center justify-center text-xs cursor-pointer transition hover:border-accent hover:text-accent">
+                                                <i class="fas fa-upload mr-2"></i> Subir Banner
+                                                <input type="file" accept="image/*" class="hidden" onchange="subirBanner(event)">
+                                            </label>
+                                            <button onclick="borrarBanner()" class="text-red-600 text-xs font-bold px-3 hover:underline hidden" id="btn-borrar-banner">Quitar Banner</button>
                                         </div>
                                     </div>
                                 </div>
@@ -325,14 +347,20 @@
                 </button>
             </div>
         </header>
-        <div class="px-4 md:px-8 py-4 bg-card border-b border-borderline">
+
+        <!-- BANNER DE MARCA (OPCIONAL) -->
+        <div id="public-banner-container" class="hidden px-4 md:px-8 pt-6 bg-base w-full max-w-[1400px] mx-auto">
+            <img id="public-banner-img" src="" class="w-full h-32 md:h-48 lg:h-64 object-cover rounded-2xl shadow-sm border border-borderline">
+        </div>
+
+        <div class="px-4 md:px-8 pt-6 pb-4 bg-transparent">
             <div class="max-w-4xl mx-auto relative mb-4">
                 <i class="fas fa-search absolute left-4 top-3.5 text-muted"></i>
-                <input type="text" id="buscador-tienda" placeholder="Buscar productos por nombre o SKU..." oninput="debouncedRenderTienda()" class="w-full bg-input border border-borderline text-main pl-12 pr-4 py-3 rounded-xl font-bold focus:border-accent outline-none">
+                <input type="text" id="buscador-tienda" placeholder="Buscar productos por nombre, material o SKU..." oninput="debouncedRenderTienda()" class="w-full bg-card border border-borderline text-main pl-12 pr-4 py-3 rounded-xl font-bold focus:border-accent outline-none shadow-sm">
             </div>
             <div class="max-w-[1400px] mx-auto flex gap-2 overflow-x-auto pb-1 scrollbar-none" id="contenedor-categorias"></div>
         </div>
-        <div class="flex-grow p-4 md:p-8 overflow-y-auto">
+        <div class="flex-grow px-4 md:px-8 pb-8 overflow-y-auto">
             <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6" id="grid-productos-tienda"></div>
         </div>
     </div>
@@ -414,8 +442,8 @@
                 <div><label class="text-[9px] font-bold text-muted uppercase block mb-1">Nombre de Producto</label><input type="text" id="stock-nombre" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-sm font-bold" required></div>
                 
                 <div>
-                    <label class="text-[9px] font-bold text-muted uppercase block mb-1">Descripción (Opcional - Máx 300 car.)</label>
-                    <textarea id="stock-desc" rows="2" maxlength="300" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-xs resize-none placeholder-muted" placeholder="Detalles, medidas, materiales..."></textarea>
+                    <label class="text-[9px] font-bold text-muted uppercase block mb-1">Descripción (Opcional - Detalles, Material, etc.)</label>
+                    <textarea id="stock-desc" rows="2" maxlength="300" class="w-full border border-borderline bg-input text-main p-2.5 rounded-lg text-xs resize-none placeholder-muted" placeholder="Ej: Acero quirúrgico, no se oxida, talle único..."></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -450,7 +478,7 @@
         let db = { config: {}, usuarios: [], productos: [] };
         
         function verificarIntegridadDB() {
-            if(!db.config) db.config = { nombreEmpresa: 'Mi Tienda', whatsappTurnos: '', tema: 'oliva', logoBase64: '', pinAdmin: '1234' };
+            if(!db.config) db.config = { nombreEmpresa: 'Mi Tienda', whatsappTurnos: '', tema: 'oliva', logoBase64: '', bannerBase64: '', pinAdmin: '1234' };
             if(!db.config.tema) db.config.tema = 'oliva';
             if(!db.config.pinAdmin) db.config.pinAdmin = '1234';
             if(!db.usuarios || db.usuarios.length===0) db.usuarios = [ { id: 'admin', nombre: 'Admin', pin: '1234' } ];
@@ -596,6 +624,7 @@
             if(document.getElementById('login-store-name')) document.getElementById('login-store-name').innerText = nombre;
             if(db.config.tema) { cambiarTema(db.config.tema, true); }
             
+            // Render Logo
             if(db.config.logoBase64) {
                 if(document.getElementById('preview-logo')) document.getElementById('preview-logo').innerHTML = `<img src="${db.config.logoBase64}" class="w-full h-full object-cover">`;
                 if(document.getElementById('btn-borrar-logo')) document.getElementById('btn-borrar-logo').classList.remove('hidden');
@@ -614,6 +643,27 @@
                 if(pIcon && pImg) { pIcon.classList.remove('hidden'); pImg.src = ""; pImg.classList.add('hidden'); }
                 const lIcon = document.getElementById('login-logo-icon'), lImg = document.getElementById('login-logo-img');
                 if(lIcon && lImg) { lIcon.classList.remove('hidden'); lImg.src = ""; lImg.classList.add('hidden'); }
+            }
+
+            // Render Banner
+            if(db.config.bannerBase64) {
+                if(document.getElementById('preview-banner')) document.getElementById('preview-banner').innerHTML = `<img src="${db.config.bannerBase64}" class="w-full h-full object-cover">`;
+                if(document.getElementById('btn-borrar-banner')) document.getElementById('btn-borrar-banner').classList.remove('hidden');
+                
+                const pubBannerCont = document.getElementById('public-banner-container');
+                const pubBannerImg = document.getElementById('public-banner-img');
+                if(pubBannerCont && pubBannerImg) {
+                    pubBannerImg.src = db.config.bannerBase64;
+                    pubBannerCont.classList.remove('hidden');
+                }
+            } else {
+                if(document.getElementById('preview-banner')) document.getElementById('preview-banner').innerHTML = `<i class="fas fa-image text-muted text-xl"></i>`;
+                if(document.getElementById('btn-borrar-banner')) document.getElementById('btn-borrar-banner').classList.add('hidden');
+                
+                const pubBannerCont = document.getElementById('public-banner-container');
+                if(pubBannerCont) {
+                    pubBannerCont.classList.add('hidden');
+                }
             }
         }
 
@@ -664,6 +714,33 @@
                 db.config.logoBase64 = "";
                 aplicarConfiguracion();
                 mostrarToast('Logo eliminado');
+                guardarBD();
+            }
+        }
+
+        async function subirBanner(e) {
+            const file = e.target.files[0]; if(!file) return;
+            document.getElementById('carga-overlay-global').style.display = 'flex';
+            document.getElementById('carga-overlay-msg').innerText = 'Subiendo banner...';
+            try {
+                // Comprimimos el banner a 800px para mantener calidad sin reventar el localStorage
+                const base64 = await comprimirImagenAsincrona(file, 800);
+                db.config.bannerBase64 = base64;
+                aplicarConfiguracion();
+                mostrarToast('Banner actualizado');
+                guardarBD();
+            } catch(err) { 
+                mostrarToast('Error al procesar banner', 'bg-red-600'); 
+            } finally {
+                document.getElementById('carga-overlay-global').style.display = 'none';
+            }
+        }
+
+        function borrarBanner() {
+            if(confirm('¿Segura que querés eliminar el banner de la tienda?')) {
+                db.config.bannerBase64 = "";
+                aplicarConfiguracion();
+                mostrarToast('Banner eliminado');
                 guardarBD();
             }
         }
@@ -926,7 +1003,6 @@
             mostrarToast('Excel descargado con éxito');
         }
 
-        /* FIX DE ARQUITECTURA DE RENDERING PARA PDF */
         function generarCatalogoPDF() {
             if(!db.productos || db.productos.length === 0) return mostrarToast('El catálogo está vacío', 'bg-orange-500');
             
